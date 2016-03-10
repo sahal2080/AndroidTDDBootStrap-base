@@ -60,6 +60,13 @@ public class ProviderModule {
     @Singleton
     @Provides
     OkHttpClient provideHttpClient() {
+        return provideHttpClientInternal();
+    }
+
+    /**
+     * Override this method to provide mock http client in test app.
+     * */
+    protected OkHttpClient provideHttpClientInternal() {
         return HttpClientProvider.provideHttpClient();
     }
 
