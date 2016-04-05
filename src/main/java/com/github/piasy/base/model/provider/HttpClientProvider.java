@@ -24,14 +24,22 @@
 
 package com.github.piasy.base.model.provider;
 
+import android.support.annotation.NonNull;
+import auto.parcel.AutoParcel;
+import com.facebook.stetho.okhttp3.StethoInterceptor;
 import okhttp3.OkHttpClient;
+import okhttp3.logging.HttpLoggingInterceptor;
+import timber.log.Timber;
 
 /**
  * Created by Piasy{github.com/Piasy} on 15/7/23.
  *
  * A singleton provider providing {@link OkHttpClient}.
  */
+@SuppressWarnings("PMD.NonThreadSafeSingleton")
 public final class HttpClientProvider {
+
+    private static volatile OkHttpClient sOkHttpClient;
 
     private HttpClientProvider() {
         // singleton
@@ -43,17 +51,46 @@ public final class HttpClientProvider {
      *
      * @return the singleton {@link OkHttpClient}.
      */
-    static OkHttpClient provideHttpClient() {
-        return OkHttpClientHolder.sOkHttpClient;
+    @SuppressWarnings("PMD.AvoidDeeplyNestedIfStmts")
+    static OkHttpClient provideHttpClient(final Config config) {
+        if (sOkHttpClient == null) {
+            synchronized (HttpClientProvider.class) {
+                if (sOkHttpClient == null) {
+                    final OkHttpClient.Builder builder = new OkHttpClient.Builder();
+                    if (config.enableLog()) {
+                        final HttpLoggingInterceptor httpLoggingInterceptor =
+                                new HttpLoggingInterceptor(new HttpLoggingInterceptor.Logger() {
+                                    @Override
+                                    public void log(final String message) {
+                                        Timber.tag("OkHttp").d(message);
+                                    }
+                                }).setLevel(HttpLoggingInterceptor.Level.BODY);
+                        builder.addNetworkInterceptor(new StethoInterceptor())
+                                .addInterceptor(httpLoggingInterceptor);
+                    }
+                    sOkHttpClient = builder.build();
+                }
+            }
+        }
+        return sOkHttpClient;
     }
 
-    private static class OkHttpClientHolder {
-        // lazy instantiate
-        private static volatile OkHttpClient sOkHttpClient;
+    // CHECKSTYLE:OFF
+    @AutoParcel
+    public abstract static class Config {
+        @NonNull
+        public static Builder builder() {
+            return new AutoParcel_HttpClientProvider_Config.Builder();
+        }
 
-        static {
-            sOkHttpClient = new OkHttpClient();
-            //sOkHttpClient.networkInterceptors().add(new StethoInterceptor());
+        public abstract boolean enableLog();
+
+        @AutoParcel.Builder
+        public abstract static class Builder {
+            public abstract Builder enableLog(final boolean enableLog);
+
+            public abstract Config build();
         }
     }
+    // CHECKSTYLE:ON
 }

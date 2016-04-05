@@ -35,11 +35,13 @@ import org.junit.Test;
 public class HttpClientProviderTest {
 
     private OkHttpClient one, two;
+    private HttpClientProvider.Config mConfig =
+            HttpClientProvider.Config.builder().enableLog(false).build();
 
     @Test
     public void testProvideRestAdapter() {
-        one = HttpClientProvider.provideHttpClient();
-        two = HttpClientProvider.provideHttpClient();
+        one = HttpClientProvider.provideHttpClient(mConfig);
+        two = HttpClientProvider.provideHttpClient(mConfig);
 
         Assert.assertTrue(one.equals(two));
     }
@@ -49,14 +51,14 @@ public class HttpClientProviderTest {
         final Thread t1 = new Thread(new Runnable() {
             @Override
             public void run() {
-                one = HttpClientProvider.provideHttpClient();
+                one = HttpClientProvider.provideHttpClient(mConfig);
             }
         });
 
         final Thread t2 = new Thread(new Runnable() {
             @Override
             public void run() {
-                two = HttpClientProvider.provideHttpClient();
+                two = HttpClientProvider.provideHttpClient(mConfig);
             }
         });
 

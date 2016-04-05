@@ -53,21 +53,22 @@ public class ProviderModule {
 
     @Singleton
     @Provides
-    Retrofit provideRetrofit(final RetrofitProvider.Config config, final Gson gson) {
-        return RetrofitProvider.provideRetrofit(config, gson);
+    Retrofit provideRetrofit(final RetrofitProvider.Config config, final OkHttpClient okHttpClient,
+            final Gson gson) {
+        return RetrofitProvider.provideRetrofit(config, okHttpClient, gson);
     }
 
     @Singleton
     @Provides
-    OkHttpClient provideHttpClient() {
-        return provideHttpClientInternal();
+    OkHttpClient provideHttpClient(final HttpClientProvider.Config config) {
+        return provideHttpClientInternal(config);
     }
 
     /**
      * Override this method to provide mock http client in test app.
-     * */
-    protected OkHttpClient provideHttpClientInternal() {
-        return HttpClientProvider.provideHttpClient();
+     */
+    protected OkHttpClient provideHttpClientInternal(final HttpClientProvider.Config config) {
+        return HttpClientProvider.provideHttpClient(config);
     }
 
     @Singleton

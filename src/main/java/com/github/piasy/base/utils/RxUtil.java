@@ -39,7 +39,7 @@ public final class RxUtil {
     public static final Action1<Throwable> OnErrorLogger = new Action1<Throwable>() {
         @Override
         public void call(final Throwable throwable) {
-            Timber.d(throwable, "OnErrorLogger");
+            Timber.e(throwable, "OnErrorLogger");
         }
     };
 

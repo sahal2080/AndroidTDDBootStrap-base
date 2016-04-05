@@ -101,6 +101,10 @@ dependencies {
     }
     compile baseDependencies.eventBus
     compile baseDependencies.okHttp
+    compile baseDependencies.okHttpLogging
+    compile (baseDependencies.stethoOkhttp) {
+        exclude module: 'okhttp'
+    }
     compile (baseDependencies.retrofit) {
         exclude module: 'okhttp'
     }
@@ -135,7 +139,6 @@ dependencies {
         exclude module: 'rxjava'
     }
 
-    compile baseDependencies.xLogCompiler
     compile baseDependencies.timber
 
     testCompile project(':testbase')

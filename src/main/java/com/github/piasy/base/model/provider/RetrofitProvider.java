@@ -27,6 +27,7 @@ package com.github.piasy.base.model.provider;
 import android.support.annotation.NonNull;
 import auto.parcel.AutoParcel;
 import com.google.gson.Gson;
+import okhttp3.OkHttpClient;
 import retrofit2.Retrofit;
 import retrofit2.adapter.rxjava.RxJavaCallAdapterFactory;
 import retrofit2.converter.gson.GsonConverterFactory;
@@ -49,12 +50,13 @@ public final class RetrofitProvider {
      *
      * @return the singleton {@link Retrofit}.
      */
-    static Retrofit provideRetrofit(final Config config, final Gson gson) {
+    static Retrofit provideRetrofit(final Config config, final OkHttpClient okHttpClient,
+            final Gson gson) {
         if (sRetrofit == null) {
             synchronized (RetrofitProvider.class) {
                 if (sRetrofit == null) {
                     sRetrofit = new Retrofit.Builder().baseUrl(config.baseUrl())
-                            .client(HttpClientProvider.provideHttpClient())
+                            .client(okHttpClient)
                             .addConverterFactory(GsonConverterFactory.create(gson))
                             .addCallAdapterFactory(RxJavaCallAdapterFactory.create())
                             .build();

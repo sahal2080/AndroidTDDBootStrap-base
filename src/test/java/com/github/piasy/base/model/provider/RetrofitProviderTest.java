@@ -26,6 +26,7 @@ package com.github.piasy.base.model.provider;
 
 import com.google.gson.Gson;
 import junit.framework.Assert;
+import okhttp3.OkHttpClient;
 import org.junit.Test;
 import retrofit2.Retrofit;
 
@@ -39,12 +40,14 @@ public class RetrofitProviderTest {
     private RetrofitProvider.Config mConfig =
             RetrofitProvider.Config.builder().baseUrl(GITHUB_SERVER_BASE_URL).build();
     private Gson mGson = GsonProviderExposure.exposeGson();
+    private OkHttpClient mOkHttpClient = HttpClientProvider.provideHttpClient(
+            HttpClientProvider.Config.builder().enableLog(false).build());
     private Retrofit one, two;
 
     @Test
     public void testProvideRestAdapter() {
-        one = RetrofitProvider.provideRetrofit(mConfig, mGson);
-        two = RetrofitProvider.provideRetrofit(mConfig, mGson);
+        one = RetrofitProvider.provideRetrofit(mConfig, mOkHttpClient, mGson);
+        two = RetrofitProvider.provideRetrofit(mConfig, mOkHttpClient, mGson);
 
         Assert.assertTrue(one.equals(two));
     }
@@ -54,14 +57,14 @@ public class RetrofitProviderTest {
         final Thread t1 = new Thread(new Runnable() {
             @Override
             public void run() {
-                one = RetrofitProvider.provideRetrofit(mConfig, mGson);
+                one = RetrofitProvider.provideRetrofit(mConfig, mOkHttpClient, mGson);
             }
         });
 
         final Thread t2 = new Thread(new Runnable() {
             @Override
             public void run() {
-                two = RetrofitProvider.provideRetrofit(mConfig, mGson);
+                two = RetrofitProvider.provideRetrofit(mConfig, mOkHttpClient, mGson);
             }
         });
 
