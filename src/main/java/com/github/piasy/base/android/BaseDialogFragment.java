@@ -124,7 +124,9 @@ public abstract class BaseDialogFragment extends DialogFragment {
     @Override
     public void onViewCreated(final View view, final Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        initFields();
         bindView(view);
+        startBusiness();
     }
 
     protected void addSubscribe(final Subscription subscription) {
@@ -187,12 +189,26 @@ public abstract class BaseDialogFragment extends DialogFragment {
     }
 
     /**
+     * init necessary fields.
+     */
+    protected void initFields() {
+
+    }
+
+    /**
      * bind views, should override this method when bind view manually.
      */
     protected void bindView(final View rootView) {
         if (autoBindViews()) {
             ButterKnife.bind(this, rootView);
         }
+    }
+
+    /**
+     * start specific business logic.
+     */
+    protected void startBusiness() {
+
     }
 
     /**
