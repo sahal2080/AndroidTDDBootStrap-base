@@ -26,6 +26,7 @@ package com.github.piasy.base.android;
 
 import android.app.Activity;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.view.View;
 import com.github.piasy.base.di.BaseMvpComponent;
@@ -131,6 +132,13 @@ public abstract class BaseMvpDialogFragment<V extends MvpView, P extends MvpPres
         return mMvpDelegate;
     }
 
+    @NonNull
+    @Override
+    public final P createPresenter() {
+        mPresenter = getComponent().presenter();
+        return mPresenter;
+    }
+
     @Override
     public final P getPresenter() {
         return mPresenter;
@@ -138,5 +146,21 @@ public abstract class BaseMvpDialogFragment<V extends MvpView, P extends MvpPres
 
     @Override
     public final void setPresenter(final P presenter) {
+    }
+
+    @SuppressWarnings("unchecked")
+    @Override
+    public final V getMvpView() {
+        return (V) this;
+    }
+
+    @Override
+    public boolean isRetainInstance() {
+        return true;
+    }
+
+    @Override
+    public boolean shouldInstanceBeRetained() {
+        return true;
     }
 }
