@@ -80,13 +80,13 @@ dependencies {
     def baseTestDependencies = rootProject.ext.baseTestDependencies
 
     compile baseDependencies.supportAnnotation
+    compile baseDependencies.safelyAndroid
 
     compile(baseDependencies.mvp) {
         exclude module: 'appcompat-v7'
         exclude module: 'support-annotations'
     }
     compile baseDependencies.fragmentargs
-    apt baseDependencies.fragmentargsApt
 
     compile (baseDependencies.storIOSQLite) {
         exclude module: 'support-annotations'

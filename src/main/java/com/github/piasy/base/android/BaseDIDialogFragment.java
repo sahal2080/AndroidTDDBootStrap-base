@@ -43,7 +43,7 @@ public abstract class BaseDIDialogFragment<C extends BaseComponent> extends Base
      * So we init DI here.
      */
     @Override
-    public void onCreate(Bundle savedInstanceState) {
+    public void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         injectDependencies();
     }

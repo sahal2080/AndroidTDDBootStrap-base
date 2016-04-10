@@ -31,6 +31,7 @@ import android.support.annotation.LayoutRes;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.DialogFragment;
+import android.support.v4.app.FragmentTransaction;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -39,6 +40,9 @@ import android.view.Window;
 import android.view.WindowManager;
 import butterknife.ButterKnife;
 import com.github.piasy.base.utils.RxUtil;
+import com.github.piasy.safelyandroid.dialogfragment.SupportDialogFragmentDismissDelegate;
+import com.github.piasy.safelyandroid.fragment.SupportFragmentTransactionDelegate;
+import com.github.piasy.safelyandroid.fragment.TransactionCommitter;
 import com.hannesdorfmann.fragmentargs.FragmentArgs;
 import com.jakewharton.rxbinding.view.RxView;
 import java.util.concurrent.TimeUnit;
@@ -50,13 +54,19 @@ import rx.subscriptions.CompositeSubscription;
 /**
  * Created by piasy on 15/5/4.
  */
-public abstract class BaseDialogFragment extends DialogFragment {
+public abstract class BaseDialogFragment extends DialogFragment implements TransactionCommitter {
 
     private static final float DEFAULT_DIM_AMOUNT = 0.2F;
 
     private static final int WINDOW_DURATION = 1;
 
     private CompositeSubscription mCompositeSubscription;
+
+    private final SupportDialogFragmentDismissDelegate mSupportDialogFragmentDismissDelegate =
+            new SupportDialogFragmentDismissDelegate();
+
+    private final SupportFragmentTransactionDelegate mSupportFragmentTransactionDelegate =
+            new SupportFragmentTransactionDelegate();
 
     @Override
     public void onCreate(final Bundle savedInstanceState) {
@@ -67,17 +77,27 @@ public abstract class BaseDialogFragment extends DialogFragment {
         }
     }
 
-    @NonNull
+    @Nullable
     @Override
-    public Dialog onCreateDialog(final Bundle savedInstanceState) {
-        return new Dialog(getActivity(), getTheme()) {
-            @Override
-            public void onBackPressed() {
-                if (isCanceledOnBackPressed()) {
-                    super.onBackPressed();
-                }
-            }
-        };
+    public View onCreateView(final LayoutInflater inflater, @Nullable final ViewGroup container,
+            @Nullable final Bundle savedInstanceState) {
+        getDialog().getWindow().requestFeature(Window.FEATURE_NO_TITLE);
+        getDialog().setCanceledOnTouchOutside(isCanceledOnTouchOutside());
+        return inflater.inflate(getLayoutRes(), container, false);
+    }
+
+    /**
+     * CONTRACT: the new life cycle method {@link #initFields()}, {@link #bindView(View)}
+     * and {@link #startBusiness()} might use other infrastructure initialised in subclass's
+     * onViewCreated, e.g. DI, MVP, so those subclass should do those
+     * infrastructure init job before this method is invoked.
+     */
+    @Override
+    public void onViewCreated(final View view, final Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        initFields();
+        bindView(view);
+        startBusiness();
     }
 
     @Override
@@ -106,33 +126,43 @@ public abstract class BaseDialogFragment extends DialogFragment {
         }
     }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+        mSupportDialogFragmentDismissDelegate.onResumed(this);
+        mSupportFragmentTransactionDelegate.onResumed();
+    }
+
     public void onDestroyView() {
         super.onDestroyView();
         unbindView();
         unSubscribeAll();
     }
 
-    @Nullable
-    @Override
-    public View onCreateView(final LayoutInflater inflater, @Nullable final ViewGroup container,
-            @Nullable final Bundle savedInstanceState) {
-        getDialog().getWindow().requestFeature(Window.FEATURE_NO_TITLE);
-        getDialog().setCanceledOnTouchOutside(isCanceledOnTouchOutside());
-        return inflater.inflate(getLayoutRes(), container, false);
+    protected boolean safeCommit(@NonNull final FragmentTransaction transaction) {
+        return mSupportFragmentTransactionDelegate.safeCommit(this, transaction);
     }
 
-    /**
-     * CONTRACT: the new life cycle method {@link #initFields()}, {@link #bindView(View)}
-     * and {@link #startBusiness()} might use other infrastructure initialised in subclass's
-     * onViewCreated, e.g. DI, MVP, so those subclass should do those
-     * infrastructure init job before this method is invoked.
-     */
+    public boolean safeDismiss() {
+        return mSupportDialogFragmentDismissDelegate.safeDismiss(this);
+    }
+
     @Override
-    public void onViewCreated(final View view, final Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
-        initFields();
-        bindView(view);
-        startBusiness();
+    public boolean isCommitterResumed() {
+        return isResumed();
+    }
+
+    @NonNull
+    @Override
+    public Dialog onCreateDialog(final Bundle savedInstanceState) {
+        return new Dialog(getActivity(), getTheme()) {
+            @Override
+            public void onBackPressed() {
+                if (isCanceledOnBackPressed()) {
+                    super.onBackPressed();
+                }
+            }
+        };
     }
 
     protected void addSubscribe(final Subscription subscription) {
@@ -202,6 +232,7 @@ public abstract class BaseDialogFragment extends DialogFragment {
     /**
      * init necessary fields.
      */
+    @SuppressWarnings("PMD.EmptyMethodInAbstractClassShouldBeAbstract")
     protected void initFields() {
 
     }
@@ -218,6 +249,7 @@ public abstract class BaseDialogFragment extends DialogFragment {
     /**
      * start specific business logic.
      */
+    @SuppressWarnings("PMD.EmptyMethodInAbstractClassShouldBeAbstract")
     protected void startBusiness() {
 
     }

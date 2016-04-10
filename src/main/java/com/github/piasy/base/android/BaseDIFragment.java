@@ -47,7 +47,7 @@ public abstract class BaseDIFragment<C extends BaseComponent> extends BaseFragme
      * So we init DI here.
      */
     @Override
-    public void onCreate(Bundle savedInstanceState) {
+    public void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         injectDependencies();
     }

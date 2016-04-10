@@ -26,8 +26,12 @@ package com.github.piasy.base.android;
 
 import android.os.Build;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.v4.app.FragmentTransaction;
 import android.view.WindowManager;
 import com.github.piasy.base.di.ActivityModule;
+import com.github.piasy.safelyandroid.fragment.SupportFragmentTransactionDelegate;
+import com.github.piasy.safelyandroid.fragment.TransactionCommitter;
 import com.trello.rxlifecycle.components.support.RxAppCompatActivity;
 
 /**
@@ -35,7 +39,11 @@ import com.trello.rxlifecycle.components.support.RxAppCompatActivity;
  *
  * Base Activity class.
  */
-public abstract class BaseActivity extends RxAppCompatActivity {
+public abstract class BaseActivity extends RxAppCompatActivity implements TransactionCommitter {
+
+    private volatile boolean mIsResumed;
+    private final SupportFragmentTransactionDelegate mSupportFragmentTransactionDelegate =
+            new SupportFragmentTransactionDelegate();
 
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
@@ -46,6 +54,29 @@ public abstract class BaseActivity extends RxAppCompatActivity {
         }
         initializeInjector();
         super.onCreate(savedInstanceState);
+        mIsResumed = true;
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        mIsResumed = false;
+    }
+
+    protected boolean safeCommit(@NonNull final FragmentTransaction transaction) {
+        return mSupportFragmentTransactionDelegate.safeCommit(this, transaction);
+    }
+
+    @Override
+    protected void onResumeFragments() {
+        super.onResumeFragments();
+        mIsResumed = true;
+        mSupportFragmentTransactionDelegate.onResumed();
+    }
+
+    @Override
+    public boolean isCommitterResumed() {
+        return mIsResumed;
     }
 
     /**

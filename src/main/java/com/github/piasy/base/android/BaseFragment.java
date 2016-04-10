@@ -26,11 +26,15 @@ package com.github.piasy.base.android;
 
 import android.os.Bundle;
 import android.support.annotation.LayoutRes;
+import android.support.annotation.NonNull;
+import android.support.v4.app.FragmentTransaction;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import butterknife.ButterKnife;
 import com.github.piasy.base.utils.RxUtil;
+import com.github.piasy.safelyandroid.fragment.SupportFragmentTransactionDelegate;
+import com.github.piasy.safelyandroid.fragment.TransactionCommitter;
 import com.hannesdorfmann.fragmentargs.FragmentArgs;
 import com.jakewharton.rxbinding.view.RxView;
 import com.trello.rxlifecycle.components.support.RxFragment;
@@ -45,11 +49,14 @@ import rx.subscriptions.CompositeSubscription;
  *
  * Base fragment class.
  */
-public abstract class BaseFragment extends RxFragment {
+public abstract class BaseFragment extends RxFragment implements TransactionCommitter {
 
     private static final int WINDOW_DURATION = 1;
 
     private CompositeSubscription mCompositeSubscription;
+
+    private final SupportFragmentTransactionDelegate mSupportFragmentTransactionDelegate =
+            new SupportFragmentTransactionDelegate();
 
     @Override
     public void onCreate(final Bundle savedInstanceState) {
@@ -57,6 +64,13 @@ public abstract class BaseFragment extends RxFragment {
         if (hasArgs()) {
             FragmentArgs.inject(this);
         }
+    }
+
+    @Override
+    public View onCreateView(final LayoutInflater inflater, final ViewGroup container,
+            final Bundle savedInstanceState) {
+        setHasOptionsMenu(shouldHaveOptionsMenu());
+        return inflater.inflate(getLayoutRes(), container, false);
     }
 
     /**
@@ -74,6 +88,12 @@ public abstract class BaseFragment extends RxFragment {
     }
 
     @Override
+    public void onResume() {
+        super.onResume();
+        mSupportFragmentTransactionDelegate.onResumed();
+    }
+
+    @Override
     public void onDestroyView() {
         super.onDestroyView();
         unbindView();
@@ -81,10 +101,12 @@ public abstract class BaseFragment extends RxFragment {
     }
 
     @Override
-    public View onCreateView(final LayoutInflater inflater, final ViewGroup container,
-            final Bundle savedInstanceState) {
-        setHasOptionsMenu(shouldHaveOptionsMenu());
-        return inflater.inflate(getLayoutRes(), container, false);
+    public boolean isCommitterResumed() {
+        return isResumed();
+    }
+
+    protected boolean safeCommit(@NonNull final FragmentTransaction transaction) {
+        return mSupportFragmentTransactionDelegate.safeCommit(this, transaction);
     }
 
     protected void addSubscribe(final Subscription subscription) {
@@ -146,6 +168,7 @@ public abstract class BaseFragment extends RxFragment {
     /**
      * init necessary fields.
      */
+    @SuppressWarnings("PMD.EmptyMethodInAbstractClassShouldBeAbstract")
     protected void initFields() {
 
     }
@@ -162,6 +185,7 @@ public abstract class BaseFragment extends RxFragment {
     /**
      * start specific business logic.
      */
+    @SuppressWarnings("PMD.EmptyMethodInAbstractClassShouldBeAbstract")
     protected void startBusiness() {
 
     }
