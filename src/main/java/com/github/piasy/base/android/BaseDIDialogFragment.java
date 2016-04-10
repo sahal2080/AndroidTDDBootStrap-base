@@ -36,9 +36,15 @@ public abstract class BaseDIDialogFragment<C extends BaseComponent> extends Base
 
     private C mComponent;
 
+    /**
+     * according to {@link super#onViewCreated(View, Bundle)}'s contract, we should init DI
+     * infrastructure before {@link super#onViewCreated(View, Bundle)} is invoked.
+     *
+     * So we init DI here.
+     */
     @Override
-    public void onViewCreated(final View view, final Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
         injectDependencies();
     }
 

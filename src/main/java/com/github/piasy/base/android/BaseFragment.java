@@ -59,6 +59,12 @@ public abstract class BaseFragment extends RxFragment {
         }
     }
 
+    /**
+     * CONTRACT: the new life cycle method {@link #initFields()}, {@link #bindView(View)}
+     * and {@link #startBusiness()} might use other infrastructure initialised in subclass's
+     * onViewCreated, e.g. DI, MVP, so those subclass should do those
+     * infrastructure init job before this method is invoked.
+     */
     @Override
     public void onViewCreated(final View view, final Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
@@ -90,8 +96,13 @@ public abstract class BaseFragment extends RxFragment {
     }
 
     protected void listenOnClickRxy(final View view, final Action1<Void> action) {
+        listenOnClickRxy(view, WINDOW_DURATION, action);
+    }
+
+    protected void listenOnClickRxy(final View view, final int seconds,
+            final Action1<Void> action) {
         addSubscribe(RxView.clicks(view)
-                .throttleFirst(WINDOW_DURATION, TimeUnit.SECONDS)
+                .throttleFirst(seconds, TimeUnit.SECONDS)
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(action, RxUtil.OnErrorLogger));
     }

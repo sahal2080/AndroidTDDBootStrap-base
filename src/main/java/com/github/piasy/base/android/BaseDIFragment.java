@@ -40,10 +40,16 @@ public abstract class BaseDIFragment<C extends BaseComponent> extends BaseFragme
 
     private C mComponent;
 
+    /**
+     * according to {@link super#onViewCreated(View, Bundle)}'s contract, we should init DI
+     * infrastructure before {@link super#onViewCreated(View, Bundle)} is invoked.
+     *
+     * So we init DI here.
+     */
     @Override
-    public void onViewCreated(final View view, final Bundle savedInstanceState) {
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
         injectDependencies();
-        super.onViewCreated(view, savedInstanceState);
     }
 
     @SuppressWarnings("unchecked")

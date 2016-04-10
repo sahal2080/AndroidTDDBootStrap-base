@@ -101,23 +101,29 @@ public abstract class BaseMvpFragment<V extends MvpView, P extends MvpPresenter<
         getMvpDelegate().onCreate(savedInstanceState);
     }
 
-    @Override
-    public void onDestroyView() {
-        super.onDestroyView();
-        getMvpDelegate().onDestroyView();
-    }
-
-    @Override
-    public void onViewCreated(final View view, final Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
-        getMvpDelegate().onViewCreated(view, savedInstanceState);
-    }
-
     /**
      * inject dependencies.
      * Normally implementation should be {@code getComponent().inject(this)}
      */
     protected abstract void inject();
+
+    /**
+     * according to {@link super#onViewCreated(View, Bundle)}'s contract, we should init MVP
+     * infrastructure before {@link super#onViewCreated(View, Bundle)} is invoked.
+     *
+     * So we init MVP here and before call super.
+     */
+    @Override
+    public void onViewCreated(final View view, final Bundle savedInstanceState) {
+        getMvpDelegate().onViewCreated(view, savedInstanceState);
+        super.onViewCreated(view, savedInstanceState);
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        getMvpDelegate().onDestroyView();
+    }
 
     @Override
     public void onActivityCreated(@Nullable final Bundle savedInstanceState) {

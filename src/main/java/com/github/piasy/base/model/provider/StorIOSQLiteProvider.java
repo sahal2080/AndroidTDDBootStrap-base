@@ -37,7 +37,7 @@ import java.util.Map;
  *
  * A singleton provider providing {@link StorIOSQLite}.
  */
-@SuppressWarnings(value = {"PMD.NonThreadSafeSingleton", "PMD.DataflowAnomalyAnalysis"})
+@SuppressWarnings(value = { "PMD.NonThreadSafeSingleton", "PMD.DataflowAnomalyAnalysis" })
 public final class StorIOSQLiteProvider {
 
     private static volatile StorIOSQLite sStorIOSQLite;
