@@ -25,7 +25,6 @@
 package com.github.piasy.base.android;
 
 import android.os.Bundle;
-import android.view.View;
 import com.github.piasy.base.di.BaseComponent;
 import com.github.piasy.base.di.HasComponent;
 
@@ -37,8 +36,9 @@ public abstract class BaseDIDialogFragment<C extends BaseComponent> extends Base
     private C mComponent;
 
     /**
-     * according to {@link super#onViewCreated(View, Bundle)}'s contract, we should init DI
-     * infrastructure before {@link super#onViewCreated(View, Bundle)} is invoked.
+     * according to {@link super#onViewCreated(android.view.View, Bundle)}'s contract, we should
+     * init DI infrastructure before {@link super#onViewCreated(android.view.View, Bundle)} is
+     * invoked.
      *
      * So we init DI here.
      */
