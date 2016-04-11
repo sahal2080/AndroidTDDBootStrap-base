@@ -35,9 +35,9 @@ import butterknife.ButterKnife;
 import com.github.piasy.base.utils.RxUtil;
 import com.github.piasy.safelyandroid.fragment.SupportFragmentTransactionDelegate;
 import com.github.piasy.safelyandroid.fragment.TransactionCommitter;
-import com.hannesdorfmann.fragmentargs.FragmentArgs;
 import com.jakewharton.rxbinding.view.RxView;
 import com.trello.rxlifecycle.components.support.RxFragment;
+import com.yatatsu.autobundle.AutoBundle;
 import java.util.concurrent.TimeUnit;
 import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
@@ -62,7 +62,7 @@ public abstract class BaseFragment extends RxFragment implements TransactionComm
     public void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (hasArgs()) {
-            FragmentArgs.inject(this);
+            AutoBundle.bind(this);
         }
     }
 
@@ -151,7 +151,7 @@ public abstract class BaseFragment extends RxFragment implements TransactionComm
     }
 
     /**
-     * When use FragmentArgs to inject arguments, should override this and return {@code true}.
+     * When use AutoBundle to inject arguments, should override this and return {@code true}.
      */
     protected boolean hasArgs() {
         return false;

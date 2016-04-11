@@ -33,6 +33,7 @@ import com.github.piasy.base.di.ActivityModule;
 import com.github.piasy.safelyandroid.fragment.SupportFragmentTransactionDelegate;
 import com.github.piasy.safelyandroid.fragment.TransactionCommitter;
 import com.trello.rxlifecycle.components.support.RxAppCompatActivity;
+import com.yatatsu.autobundle.AutoBundle;
 
 /**
  * Created by Piasy{github.com/Piasy} on 15/7/23.
@@ -54,6 +55,13 @@ public abstract class BaseActivity extends RxAppCompatActivity implements Transa
         }
         initializeInjector();
         super.onCreate(savedInstanceState);
+        if (hasArgs()) {
+            if (savedInstanceState != null) {
+                AutoBundle.bind(this, savedInstanceState);
+            } else {
+                AutoBundle.bind(this);
+            }
+        }
         mIsResumed = true;
     }
 
@@ -77,6 +85,13 @@ public abstract class BaseActivity extends RxAppCompatActivity implements Transa
     @Override
     public boolean isCommitterResumed() {
         return mIsResumed;
+    }
+
+    /**
+     * When use AutoBundle to inject arguments, should override this and return {@code true}.
+     */
+    protected boolean hasArgs() {
+        return false;
     }
 
     /**
