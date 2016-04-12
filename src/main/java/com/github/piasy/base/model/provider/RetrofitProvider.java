@@ -31,6 +31,7 @@ import okhttp3.OkHttpClient;
 import retrofit2.Retrofit;
 import retrofit2.adapter.rxjava.RxJavaCallAdapterFactory;
 import retrofit2.converter.gson.GsonConverterFactory;
+import rx.schedulers.Schedulers;
 
 /**
  * Created by Piasy{github.com/Piasy} on 15/7/23.
@@ -58,7 +59,8 @@ public final class RetrofitProvider {
                     sRetrofit = new Retrofit.Builder().baseUrl(config.baseUrl())
                             .client(okHttpClient)
                             .addConverterFactory(GsonConverterFactory.create(gson))
-                            .addCallAdapterFactory(RxJavaCallAdapterFactory.create())
+                            .addCallAdapterFactory(
+                                    RxJavaCallAdapterFactory.createWithScheduler(Schedulers.io()))
                             .build();
                 }
             }
