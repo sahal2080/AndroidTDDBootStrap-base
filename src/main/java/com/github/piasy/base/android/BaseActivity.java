@@ -56,10 +56,10 @@ public abstract class BaseActivity extends RxAppCompatActivity implements Transa
         initializeInjector();
         super.onCreate(savedInstanceState);
         if (hasArgs()) {
-            if (savedInstanceState != null) {
-                AutoBundle.bind(this, savedInstanceState);
-            } else {
+            if (savedInstanceState == null) {
                 AutoBundle.bind(this);
+            } else {
+                AutoBundle.bind(this, savedInstanceState);
             }
         }
         mIsResumed = true;
