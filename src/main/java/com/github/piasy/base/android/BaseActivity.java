@@ -24,12 +24,14 @@
 
 package com.github.piasy.base.android;
 
+import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.FragmentTransaction;
 import android.view.WindowManager;
 import com.github.piasy.base.di.ActivityModule;
+import com.github.piasy.safelyandroid.activity.StartActivityDelegate;
 import com.github.piasy.safelyandroid.fragment.SupportFragmentTransactionDelegate;
 import com.github.piasy.safelyandroid.fragment.TransactionCommitter;
 import com.trello.rxlifecycle.components.support.RxAppCompatActivity;
@@ -85,6 +87,10 @@ public abstract class BaseActivity extends RxAppCompatActivity implements Transa
     @Override
     public boolean isCommitterResumed() {
         return mIsResumed;
+    }
+
+    protected final boolean startActivitySafely(final Intent intent) {
+        return StartActivityDelegate.startActivitySafely(this, intent);
     }
 
     /**

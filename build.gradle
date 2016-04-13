@@ -80,7 +80,9 @@ dependencies {
     def baseTestDependencies = rootProject.ext.baseTestDependencies
 
     compile baseDependencies.supportAnnotation
-    compile baseDependencies.safelyAndroid
+    compile(baseDependencies.safelyAndroid) {
+        exclude module: 'appcompat-v7'
+    }
 
     compile(baseDependencies.mvp) {
         exclude module: 'appcompat-v7'
@@ -88,7 +90,7 @@ dependencies {
     }
     compile baseDependencies.autoBundle
 
-    compile (baseDependencies.storIOSQLite) {
+    compile(baseDependencies.storIOSQLite) {
         exclude module: 'support-annotations'
     }
     compile baseDependencies.storIOSQLiteAnnotation
@@ -96,22 +98,22 @@ dependencies {
     compile baseDependencies.threetenabp
     compile baseDependencies.gson
     compile baseDependencies.rxJava
-    compile (baseDependencies.rxAndroid) {
+    compile(baseDependencies.rxAndroid) {
         exclude module: 'rxjava'
     }
     compile baseDependencies.eventBus
     compile baseDependencies.okHttp
     compile baseDependencies.okHttpLogging
-    compile (baseDependencies.stethoOkhttp) {
+    compile(baseDependencies.stethoOkhttp) {
         exclude module: 'okhttp'
     }
-    compile (baseDependencies.retrofit) {
+    compile(baseDependencies.retrofit) {
         exclude module: 'okhttp'
     }
-    compile (baseDependencies.retrofitGsonConverter) {
+    compile(baseDependencies.retrofitGsonConverter) {
         exclude module: 'gson'
     }
-    compile (baseDependencies.retrofitRxJavaAdapter) {
+    compile(baseDependencies.retrofitRxJavaAdapter) {
         exclude module: 'rxjava'
     }
 
@@ -124,7 +126,7 @@ dependencies {
     compile baseDependencies.butterKnife
 
     compile baseDependencies.androidSupportAppCompatV7
-    compile (baseDependencies.rxBindingAppCompatV7) {
+    compile(baseDependencies.rxBindingAppCompatV7) {
         exclude module: 'support-annotations'
         exclude module: 'appcompat-v7'
         exclude module: 'rxjava'
@@ -142,7 +144,7 @@ dependencies {
     compile baseDependencies.timber
 
     testCompile project(':testbase')
-    testCompile (baseTestDependencies.junit) {
+    testCompile(baseTestDependencies.junit) {
         exclude module: 'hamcrest-core'
     }
     testCompile baseTestDependencies.mockito

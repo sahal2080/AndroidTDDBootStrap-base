@@ -25,6 +25,7 @@
 package com.github.piasy.base.android;
 
 import android.app.Dialog;
+import android.content.Intent;
 import android.content.res.Resources;
 import android.os.Bundle;
 import android.support.annotation.LayoutRes;
@@ -40,6 +41,7 @@ import android.view.Window;
 import android.view.WindowManager;
 import butterknife.ButterKnife;
 import com.github.piasy.base.utils.RxUtil;
+import com.github.piasy.safelyandroid.activity.StartActivityDelegate;
 import com.github.piasy.safelyandroid.dialogfragment.SupportDialogFragmentDismissDelegate;
 import com.github.piasy.safelyandroid.fragment.SupportFragmentTransactionDelegate;
 import com.github.piasy.safelyandroid.fragment.TransactionCommitter;
@@ -137,6 +139,10 @@ public abstract class BaseDialogFragment extends DialogFragment implements Trans
         super.onDestroyView();
         unbindView();
         unSubscribeAll();
+    }
+
+    protected final boolean startActivitySafely(final Intent intent) {
+        return StartActivityDelegate.startActivitySafely(this, intent);
     }
 
     protected boolean safeCommit(@NonNull final FragmentTransaction transaction) {

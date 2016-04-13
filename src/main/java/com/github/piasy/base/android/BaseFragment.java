@@ -24,6 +24,7 @@
 
 package com.github.piasy.base.android;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.LayoutRes;
 import android.support.annotation.NonNull;
@@ -33,6 +34,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import butterknife.ButterKnife;
 import com.github.piasy.base.utils.RxUtil;
+import com.github.piasy.safelyandroid.activity.StartActivityDelegate;
 import com.github.piasy.safelyandroid.fragment.SupportFragmentTransactionDelegate;
 import com.github.piasy.safelyandroid.fragment.TransactionCommitter;
 import com.jakewharton.rxbinding.view.RxView;
@@ -103,6 +105,10 @@ public abstract class BaseFragment extends RxFragment implements TransactionComm
     @Override
     public boolean isCommitterResumed() {
         return isResumed();
+    }
+
+    protected final boolean startActivitySafely(final Intent intent) {
+        return StartActivityDelegate.startActivitySafely(this, intent);
     }
 
     protected boolean safeCommit(@NonNull final FragmentTransaction transaction) {
