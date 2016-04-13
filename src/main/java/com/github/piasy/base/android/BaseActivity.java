@@ -25,11 +25,9 @@
 package com.github.piasy.base.android;
 
 import android.content.Intent;
-import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.FragmentTransaction;
-import android.view.WindowManager;
 import com.github.piasy.base.di.ActivityModule;
 import com.github.piasy.safelyandroid.activity.StartActivityDelegate;
 import com.github.piasy.safelyandroid.fragment.SupportFragmentTransactionDelegate;
@@ -50,11 +48,6 @@ public abstract class BaseActivity extends RxAppCompatActivity implements Transa
 
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-            final WindowManager.LayoutParams localLayoutParams = getWindow().getAttributes();
-            localLayoutParams.flags =
-                    WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS | localLayoutParams.flags;
-        }
         initializeInjector();
         super.onCreate(savedInstanceState);
         if (hasArgs()) {
