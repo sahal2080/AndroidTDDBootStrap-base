@@ -56,6 +56,7 @@ import rx.subscriptions.CompositeSubscription;
 /**
  * Created by piasy on 15/5/4.
  */
+@SuppressWarnings("PMD.TooManyMethods")
 public abstract class BaseDialogFragment extends DialogFragment implements TransactionCommitter {
 
     private static final float DEFAULT_DIM_AMOUNT = 0.2F;
