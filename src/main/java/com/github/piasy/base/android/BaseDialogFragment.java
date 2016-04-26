@@ -40,6 +40,7 @@ import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
 import butterknife.ButterKnife;
+import butterknife.Unbinder;
 import com.github.piasy.base.utils.RxUtil;
 import com.github.piasy.safelyandroid.activity.StartActivityDelegate;
 import com.github.piasy.safelyandroid.dialogfragment.SupportDialogFragmentDismissDelegate;
@@ -70,6 +71,7 @@ public abstract class BaseDialogFragment extends DialogFragment implements Trans
 
     private final SupportFragmentTransactionDelegate mSupportFragmentTransactionDelegate =
             new SupportFragmentTransactionDelegate();
+    private Unbinder mUnBinder;
 
     @Override
     public void onCreate(final Bundle savedInstanceState) {
@@ -249,7 +251,7 @@ public abstract class BaseDialogFragment extends DialogFragment implements Trans
      */
     protected void bindView(final View rootView) {
         if (autoBindViews()) {
-            ButterKnife.bind(this, rootView);
+            mUnBinder = ButterKnife.bind(this, rootView);
         }
     }
 
@@ -265,8 +267,8 @@ public abstract class BaseDialogFragment extends DialogFragment implements Trans
      * unbind views, should override this method when unbind view manually.
      */
     protected void unbindView() {
-        if (autoBindViews()) {
-            ButterKnife.unbind(this);
+        if (autoBindViews() && mUnBinder != null) {
+            mUnBinder.unbind();
         }
     }
 }

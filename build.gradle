@@ -132,6 +132,7 @@ dependencies {
         exclude module: 'rxjava'
     }
     compile(baseDependencies.rxLifeCycle) {
+        exclude module: 'support-annotations'
         exclude module: 'rxbinding'
         exclude module: 'rxjava'
     }

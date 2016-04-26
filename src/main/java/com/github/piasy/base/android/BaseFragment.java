@@ -33,6 +33,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import butterknife.ButterKnife;
+import butterknife.Unbinder;
 import com.github.piasy.base.utils.RxUtil;
 import com.github.piasy.safelyandroid.activity.StartActivityDelegate;
 import com.github.piasy.safelyandroid.fragment.SupportFragmentTransactionDelegate;
@@ -59,6 +60,7 @@ public abstract class BaseFragment extends RxFragment implements TransactionComm
 
     private final SupportFragmentTransactionDelegate mSupportFragmentTransactionDelegate =
             new SupportFragmentTransactionDelegate();
+    private Unbinder mUnBinder;
 
     @Override
     public void onCreate(final Bundle savedInstanceState) {
@@ -184,7 +186,7 @@ public abstract class BaseFragment extends RxFragment implements TransactionComm
      */
     protected void bindView(final View rootView) {
         if (autoBindViews()) {
-            ButterKnife.bind(this, rootView);
+            mUnBinder = ButterKnife.bind(this, rootView);
         }
     }
 
@@ -200,8 +202,8 @@ public abstract class BaseFragment extends RxFragment implements TransactionComm
      * unbind views, should override this method when unbind view manually.
      */
     protected void unbindView() {
-        if (autoBindViews()) {
-            ButterKnife.unbind(this);
+        if (autoBindViews() && mUnBinder != null) {
+            mUnBinder.unbind();
         }
     }
 }
