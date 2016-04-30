@@ -66,12 +66,6 @@ public abstract class BaseMvpFragment<V extends MvpView, P extends MvpPresenter<
     }
 
     @Override
-    public void onResume() {
-        super.onResume();
-        getMvpDelegate().onResume();
-    }
-
-    @Override
     public void onPause() {
         super.onPause();
         getMvpDelegate().onPause();
@@ -117,6 +111,12 @@ public abstract class BaseMvpFragment<V extends MvpView, P extends MvpPresenter<
     public void onViewCreated(final View view, final Bundle savedInstanceState) {
         getMvpDelegate().onViewCreated(view, savedInstanceState);
         super.onViewCreated(view, savedInstanceState);
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        getMvpDelegate().onResume();
     }
 
     @Override

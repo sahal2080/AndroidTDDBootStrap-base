@@ -55,11 +55,9 @@ import rx.subscriptions.CompositeSubscription;
 public abstract class BaseFragment extends RxFragment implements TransactionCommitter {
 
     private static final int WINDOW_DURATION = 1;
-
-    private CompositeSubscription mCompositeSubscription;
-
     private final SupportFragmentTransactionDelegate mSupportFragmentTransactionDelegate =
             new SupportFragmentTransactionDelegate();
+    private CompositeSubscription mCompositeSubscription;
     private Unbinder mUnBinder;
 
     @Override
@@ -68,13 +66,6 @@ public abstract class BaseFragment extends RxFragment implements TransactionComm
         if (hasArgs()) {
             AutoBundle.bind(this);
         }
-    }
-
-    @Override
-    public View onCreateView(final LayoutInflater inflater, final ViewGroup container,
-            final Bundle savedInstanceState) {
-        setHasOptionsMenu(shouldHaveOptionsMenu());
-        return inflater.inflate(getLayoutRes(), container, false);
     }
 
     /**
@@ -102,6 +93,13 @@ public abstract class BaseFragment extends RxFragment implements TransactionComm
         super.onDestroyView();
         unbindView();
         unSubscribeAll();
+    }
+
+    @Override
+    public View onCreateView(final LayoutInflater inflater, final ViewGroup container,
+            final Bundle savedInstanceState) {
+        setHasOptionsMenu(shouldHaveOptionsMenu());
+        return inflater.inflate(getLayoutRes(), container, false);
     }
 
     @Override

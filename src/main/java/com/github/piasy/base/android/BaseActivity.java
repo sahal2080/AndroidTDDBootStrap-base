@@ -42,9 +42,9 @@ import com.yatatsu.autobundle.AutoBundle;
  */
 public abstract class BaseActivity extends RxAppCompatActivity implements TransactionCommitter {
 
-    private volatile boolean mIsResumed;
     private final SupportFragmentTransactionDelegate mSupportFragmentTransactionDelegate =
             new SupportFragmentTransactionDelegate();
+    private volatile boolean mIsResumed;
 
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
