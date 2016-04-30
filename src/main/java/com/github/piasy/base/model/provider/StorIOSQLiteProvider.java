@@ -26,7 +26,7 @@ package com.github.piasy.base.model.provider;
 
 import android.database.sqlite.SQLiteOpenHelper;
 import android.support.annotation.NonNull;
-import auto.parcel.AutoParcel;
+import com.google.auto.value.AutoValue;
 import com.pushtorefresh.storio.sqlite.SQLiteTypeMapping;
 import com.pushtorefresh.storio.sqlite.StorIOSQLite;
 import com.pushtorefresh.storio.sqlite.impl.DefaultStorIOSQLite;
@@ -68,19 +68,18 @@ public final class StorIOSQLiteProvider {
         return sStorIOSQLite;
     }
 
-    // CHECKSTYLE:OFF
-    @AutoParcel
+    @AutoValue
     public abstract static class Config {
         @NonNull
         public static Builder builder() {
-            return new AutoParcel_StorIOSQLiteProvider_Config.Builder();
+            return new AutoValue_StorIOSQLiteProvider_Config.Builder();
         }
 
         public abstract Map<Class, SQLiteTypeMapping> typesMapping();
 
         public abstract SQLiteOpenHelper sqliteOpenHelper();
 
-        @AutoParcel.Builder
+        @AutoValue.Builder
         public abstract static class Builder {
             public abstract Builder typesMapping(final Map<Class, SQLiteTypeMapping> typesMapping);
 
@@ -89,5 +88,4 @@ public final class StorIOSQLiteProvider {
             public abstract Config build();
         }
     }
-    // CHECKSTYLE:ON
 }

@@ -25,11 +25,11 @@
 package com.github.piasy.base.model.provider;
 
 import android.support.annotation.NonNull;
-import auto.parcel.AutoParcel;
-import com.github.piasy.base.model.gson.AutoGenTypeAdapterFactory;
 import com.github.piasy.base.model.jsr310.CustomZonedDateTimeConverter;
+import com.google.auto.value.AutoValue;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.ryanharter.auto.value.gson.annotations.AutoTypeAdapterFactory;
 import org.threeten.bp.ZonedDateTime;
 import org.threeten.bp.format.DateTimeFormatter;
 
@@ -60,7 +60,7 @@ public final class GsonProvider {
                     sGson = new GsonBuilder()
                             //not exclude for auto parcel
                             //.excludeFieldsWithoutExposeAnnotation()
-                            .registerTypeAdapterFactory(new AutoGenTypeAdapterFactory())
+                            .registerTypeAdapterFactory(new AutoTypeAdapterFactory())
                             .registerTypeAdapter(ZonedDateTime.class,
                                     new CustomZonedDateTimeConverter(config.dateTimeFormatter()))
                             .setDateFormat(config.dateFormatString())
@@ -72,19 +72,18 @@ public final class GsonProvider {
         return sGson;
     }
 
-    // CHECKSTYLE:OFF
-    @AutoParcel
+    @AutoValue
     public abstract static class Config {
         @NonNull
         public static Builder builder() {
-            return new AutoParcel_GsonProvider_Config.Builder();
+            return new AutoValue_GsonProvider_Config.Builder();
         }
 
         public abstract DateTimeFormatter dateTimeFormatter();
 
         public abstract String dateFormatString();
 
-        @AutoParcel.Builder
+        @AutoValue.Builder
         public abstract static class Builder {
             public abstract Builder dateTimeFormatter(final DateTimeFormatter dateTimeFormatter);
 
@@ -93,5 +92,4 @@ public final class GsonProvider {
             public abstract Config build();
         }
     }
-    // CHECKSTYLE:ON
 }

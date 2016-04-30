@@ -25,8 +25,8 @@
 package com.github.piasy.base.model.provider;
 
 import android.support.annotation.NonNull;
-import auto.parcel.AutoParcel;
 import com.facebook.stetho.okhttp3.StethoInterceptor;
+import com.google.auto.value.AutoValue;
 import okhttp3.OkHttpClient;
 import okhttp3.logging.HttpLoggingInterceptor;
 import timber.log.Timber;
@@ -75,22 +75,20 @@ public final class HttpClientProvider {
         return sOkHttpClient;
     }
 
-    // CHECKSTYLE:OFF
-    @AutoParcel
+    @AutoValue
     public abstract static class Config {
         @NonNull
         public static Builder builder() {
-            return new AutoParcel_HttpClientProvider_Config.Builder();
+            return new AutoValue_HttpClientProvider_Config.Builder();
         }
 
         public abstract boolean enableLog();
 
-        @AutoParcel.Builder
+        @AutoValue.Builder
         public abstract static class Builder {
             public abstract Builder enableLog(final boolean enableLog);
 
             public abstract Config build();
         }
     }
-    // CHECKSTYLE:ON
 }

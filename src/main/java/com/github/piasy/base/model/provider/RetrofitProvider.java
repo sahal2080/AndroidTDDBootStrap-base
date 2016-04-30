@@ -25,7 +25,7 @@
 package com.github.piasy.base.model.provider;
 
 import android.support.annotation.NonNull;
-import auto.parcel.AutoParcel;
+import com.google.auto.value.AutoValue;
 import com.google.gson.Gson;
 import okhttp3.OkHttpClient;
 import retrofit2.Retrofit;
@@ -68,22 +68,20 @@ public final class RetrofitProvider {
         return sRetrofit;
     }
 
-    // CHECKSTYLE:OFF
-    @AutoParcel
+    @AutoValue
     public abstract static class Config {
         @NonNull
         public static Builder builder() {
-            return new AutoParcel_RetrofitProvider_Config.Builder();
+            return new AutoValue_RetrofitProvider_Config.Builder();
         }
 
         public abstract String baseUrl();
 
-        @AutoParcel.Builder
+        @AutoValue.Builder
         public abstract static class Builder {
             public abstract Builder baseUrl(final String baseUrl);
 
             public abstract Config build();
         }
     }
-    // CHECKSTYLE:ON
 }

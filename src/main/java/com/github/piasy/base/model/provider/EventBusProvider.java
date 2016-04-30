@@ -25,7 +25,7 @@
 package com.github.piasy.base.model.provider;
 
 import android.support.annotation.NonNull;
-import auto.parcel.AutoParcel;
+import com.google.auto.value.AutoValue;
 import org.greenrobot.eventbus.EventBus;
 
 /**
@@ -63,12 +63,11 @@ public final class EventBusProvider {
         return sEventBus;
     }
 
-    // CHECKSTYLE:OFF
-    @AutoParcel
+    @AutoValue
     public abstract static class Config {
         @NonNull
         public static Builder builder() {
-            return new AutoParcel_EventBusProvider_Config.Builder();
+            return new AutoValue_EventBusProvider_Config.Builder();
         }
 
         public abstract boolean logNoSubscriberMessages();
@@ -79,7 +78,7 @@ public final class EventBusProvider {
 
         public abstract boolean throwSubscriberException();
 
-        @AutoParcel.Builder
+        @AutoValue.Builder
         public abstract static class Builder {
             public abstract Builder logNoSubscriberMessages(final boolean logNoSubscriberMessages);
 
@@ -93,5 +92,4 @@ public final class EventBusProvider {
             public abstract Config build();
         }
     }
-    // CHECKSTYLE:ON
 }

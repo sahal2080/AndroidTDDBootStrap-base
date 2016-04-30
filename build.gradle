@@ -77,36 +77,39 @@ unMock {
 
 dependencies {
     def baseDependencies = rootProject.ext.baseDependencies
-    def baseTestDependencies = rootProject.ext.baseTestDependencies
+    def aptDependencies = rootProject.ext.aptDependencies
+    def testDependencies = rootProject.ext.testDependencies
 
-    compile baseDependencies.supportAnnotation
+    compile baseDependencies.androidSupportAppCompatV7
     compile(baseDependencies.safelyAndroid) {
         exclude module: 'appcompat-v7'
     }
+
+    compile baseDependencies.javaxAnnotation
 
     compile(baseDependencies.mvp) {
         exclude module: 'appcompat-v7'
         exclude module: 'support-annotations'
     }
-    compile baseDependencies.autoBundle
-
-    compile(baseDependencies.storIOSQLite) {
-        exclude module: 'support-annotations'
-    }
-    compile baseDependencies.storIOSQLiteAnnotation
-    apt baseDependencies.storIOSQLiteAnnotationProcessor
-    compile baseDependencies.threetenabp
-    compile baseDependencies.gson
     compile baseDependencies.rxJava
     compile(baseDependencies.rxAndroid) {
         exclude module: 'rxjava'
     }
-    compile baseDependencies.eventBus
-    compile baseDependencies.okHttp
-    compile baseDependencies.okHttpLogging
-    compile(baseDependencies.stethoOkhttp) {
-        exclude module: 'okhttp'
+    compile(baseDependencies.rxBindingAppCompatV7) {
+        exclude module: 'support-annotations'
+        exclude module: 'appcompat-v7'
+        exclude module: 'rxjava'
     }
+    compile(baseDependencies.rxLifeCycleComponent) {
+        exclude module: 'appcompat-v7'
+        exclude module: 'rxjava'
+    }
+    compile baseDependencies.eventBus
+    compile baseDependencies.dagger
+    compile baseDependencies.butterKnife
+
+    compile baseDependencies.gson
+    compile baseDependencies.okHttp
     compile(baseDependencies.retrofit) {
         exclude module: 'okhttp'
     }
@@ -116,37 +119,31 @@ dependencies {
     compile(baseDependencies.retrofitRxJavaAdapter) {
         exclude module: 'rxjava'
     }
-
-    compile baseDependencies.autoParcel
-    apt baseDependencies.autoParcelProcessor
-
-    compile baseDependencies.dagger
-    apt baseDependencies.daggerCompiler
-    compile baseDependencies.javaxAnnotation
-    compile baseDependencies.butterKnife
-
-    compile baseDependencies.androidSupportAppCompatV7
-    compile(baseDependencies.rxBindingAppCompatV7) {
+    compile(baseDependencies.storIOSQLite) {
         exclude module: 'support-annotations'
-        exclude module: 'appcompat-v7'
-        exclude module: 'rxjava'
     }
-    compile(baseDependencies.rxLifeCycle) {
-        exclude module: 'support-annotations'
-        exclude module: 'rxbinding'
-        exclude module: 'rxjava'
-    }
-    compile(baseDependencies.rxLifeCycleComponent) {
-        exclude module: 'rxlifecycle'
-        exclude module: 'appcompat-v7'
-        exclude module: 'rxjava'
-    }
+    compile baseDependencies.storIOSQLiteAnnotation
+
+    compile baseDependencies.autoGsonAnnotation
+
+    compile baseDependencies.threetenabp
+    compile baseDependencies.autoBundle
 
     compile baseDependencies.timber
+    compile baseDependencies.okHttpLogging
+    compile(baseDependencies.stethoOkhttp) {
+        exclude module: 'okhttp'
+    }
+
+    provided aptDependencies.autoValue  // used for AndroidStudio sync
+    apt aptDependencies.daggerApt
+    apt aptDependencies.autoParcelApt
+    apt aptDependencies.storIOSQLiteApt
+    retrolambdaConfig aptDependencies.retrolambda
 
     testCompile project(':testbase')
-    testCompile(baseTestDependencies.junit) {
+    testCompile(testDependencies.junit) {
         exclude module: 'hamcrest-core'
     }
-    testCompile baseTestDependencies.mockito
+    testCompile testDependencies.mockito
 }
