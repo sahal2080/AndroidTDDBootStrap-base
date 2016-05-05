@@ -11,18 +11,19 @@ public class ZonedDateTimeDelightAdapter implements ColumnAdapter<ZonedDateTime>
 
     private final DateTimeFormatter mDateTimeFormatter;
 
-    public ZonedDateTimeDelightAdapter(DateTimeFormatter dateTimeFormatter) {
+    public ZonedDateTimeDelightAdapter(final DateTimeFormatter dateTimeFormatter) {
         mDateTimeFormatter = dateTimeFormatter;
     }
 
     @NonNull
     @Override
-    public ZonedDateTime map(Cursor cursor, int columnIndex) {
+    public ZonedDateTime map(final Cursor cursor, final int columnIndex) {
         return mDateTimeFormatter.parse(cursor.getString(columnIndex), ZonedDateTime.FROM);
     }
 
     @Override
-    public void marshal(ContentValues values, String key, @NonNull ZonedDateTime value) {
+    public void marshal(final ContentValues values, final String key,
+            @NonNull final ZonedDateTime value) {
         values.put(key, mDateTimeFormatter.format(value));
     }
 }

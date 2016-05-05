@@ -37,11 +37,12 @@ import org.mockito.Mockito;
 public class BriteDbProviderTest {
     private BriteDbProvider.Config mConfig = BriteDbProvider.Config.builder()
             .sqliteOpenHelper(Mockito.mock(SQLiteOpenHelper.class))
+            .enableLogging(true)
             .build();
     private BriteDatabase one, two;
 
     @Test
-    public void testProvideStorIOSQLite() {
+    public void testProvideBriteDb() {
         one = BriteDbProvider.provideBriteDb(mConfig);
         two = BriteDbProvider.provideBriteDb(mConfig);
 
@@ -49,7 +50,7 @@ public class BriteDbProviderTest {
     }
 
     @Test
-    public void testProvideStorIOSQLiteConcurrently() {
+    public void testProvideBriteDbConcurrently() {
         final Thread t1 = new Thread(new Runnable() {
             @Override
             public void run() {

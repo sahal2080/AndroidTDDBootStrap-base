@@ -69,7 +69,7 @@ public final class HttpClientProvider {
                                         }).setLevel(HttpLoggingInterceptor.Level.BODY))
                                 .addInterceptor(new CurlInterceptor(new Loggable() {
                                     @Override
-                                    public void log(String message) {
+                                    public void log(final String message) {
                                         Timber.tag("Ok2Curl").d(message);
                                     }
                                 }));
