@@ -42,7 +42,7 @@ import org.threeten.bp.temporal.ChronoField;
 /**
  * Created by Piasy{github.com/Piasy} on 15/8/16.
  */
-public class ZonedDateTimeConvertTest extends BaseThreeTenBPTest {
+public class ZonedDateTimeJsonConvertTest extends BaseThreeTenBPTest {
 
     private DateTimeFormatter mDateTimeFormatter;
     private Gson mGson;
@@ -65,7 +65,7 @@ public class ZonedDateTimeConvertTest extends BaseThreeTenBPTest {
                 .withChronology(IsoChronology.INSTANCE)
                 .withZone(ZoneId.systemDefault());
         mGson = new GsonBuilder().registerTypeAdapter(ZonedDateTime.class,
-                new CustomZonedDateTimeConverter(mDateTimeFormatter)).setPrettyPrinting().create();
+                new ZonedDateTimeJsonConverter(mDateTimeFormatter)).setPrettyPrinting().create();
     }
 
     @Test
@@ -81,7 +81,7 @@ public class ZonedDateTimeConvertTest extends BaseThreeTenBPTest {
     }
 
     @Test
-    public void testZonedDateTimeSerialise() {
+    public void testSerialise() {
         final String dateStr = "2015-08-16T13:27:33Z";
         final String dateJsonStr = "\"2015-08-16T13:27:33Z\"";
         final ZonedDateTime date = mDateTimeFormatter.parse(dateStr, ZonedDateTime.FROM);

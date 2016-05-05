@@ -24,7 +24,6 @@
 
 package com.github.piasy.base.model.provider;
 
-import android.support.annotation.NonNull;
 import com.google.auto.value.AutoValue;
 import com.google.gson.Gson;
 import okhttp3.OkHttpClient;
@@ -70,7 +69,6 @@ public final class RetrofitProvider {
 
     @AutoValue
     public abstract static class Config {
-        @NonNull
         public static Builder builder() {
             return new AutoValue_RetrofitProvider_Config.Builder();
         }

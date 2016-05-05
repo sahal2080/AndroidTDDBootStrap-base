@@ -24,8 +24,7 @@
 
 package com.github.piasy.base.model.provider;
 
-import android.support.annotation.NonNull;
-import com.github.piasy.base.model.jsr310.CustomZonedDateTimeConverter;
+import com.github.piasy.base.model.jsr310.ZonedDateTimeJsonConverter;
 import com.google.auto.value.AutoValue;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -58,11 +57,9 @@ public final class GsonProvider {
             synchronized (GsonProvider.class) {
                 if (sGson == null) {
                     sGson = new GsonBuilder()
-                            //not exclude for auto parcel
-                            //.excludeFieldsWithoutExposeAnnotation()
                             .registerTypeAdapterFactory(new AutoTypeAdapterFactory())
                             .registerTypeAdapter(ZonedDateTime.class,
-                                    new CustomZonedDateTimeConverter(config.dateTimeFormatter()))
+                                    new ZonedDateTimeJsonConverter(config.dateTimeFormatter()))
                             .setDateFormat(config.dateFormatString())
                             .setPrettyPrinting()
                             .create();
@@ -74,7 +71,6 @@ public final class GsonProvider {
 
     @AutoValue
     public abstract static class Config {
-        @NonNull
         public static Builder builder() {
             return new AutoValue_GsonProvider_Config.Builder();
         }

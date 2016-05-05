@@ -25,10 +25,7 @@
 package com.github.piasy.base.model.provider;
 
 import android.database.sqlite.SQLiteOpenHelper;
-import com.pushtorefresh.storio.sqlite.SQLiteTypeMapping;
-import com.pushtorefresh.storio.sqlite.StorIOSQLite;
-import java.util.HashMap;
-import java.util.Map;
+import com.squareup.sqlbrite.BriteDatabase;
 import junit.framework.Assert;
 import org.junit.Test;
 import org.mockito.Mockito;
@@ -37,18 +34,16 @@ import org.mockito.Mockito;
  * Created by Piasy{github.com/Piasy} on 15/8/12.
  */
 
-public class StorIOSQLiteProviderTest {
-    Map<Class, SQLiteTypeMapping> typesMapping = new HashMap<>();
-    private StorIOSQLiteProvider.Config mConfig = StorIOSQLiteProvider.Config.builder()
+public class BriteDbProviderTest {
+    private BriteDbProvider.Config mConfig = BriteDbProvider.Config.builder()
             .sqliteOpenHelper(Mockito.mock(SQLiteOpenHelper.class))
-            .typesMapping(typesMapping)
             .build();
-    private StorIOSQLite one, two;
+    private BriteDatabase one, two;
 
     @Test
     public void testProvideStorIOSQLite() {
-        one = StorIOSQLiteProvider.provideStorIOSQLite(mConfig);
-        two = StorIOSQLiteProvider.provideStorIOSQLite(mConfig);
+        one = BriteDbProvider.provideBriteDb(mConfig);
+        two = BriteDbProvider.provideBriteDb(mConfig);
 
         Assert.assertTrue(one.equals(two));
     }
@@ -58,14 +53,14 @@ public class StorIOSQLiteProviderTest {
         final Thread t1 = new Thread(new Runnable() {
             @Override
             public void run() {
-                one = StorIOSQLiteProvider.provideStorIOSQLite(mConfig);
+                one = BriteDbProvider.provideBriteDb(mConfig);
             }
         });
 
         final Thread t2 = new Thread(new Runnable() {
             @Override
             public void run() {
-                two = StorIOSQLiteProvider.provideStorIOSQLite(mConfig);
+                two = BriteDbProvider.provideBriteDb(mConfig);
             }
         });
 

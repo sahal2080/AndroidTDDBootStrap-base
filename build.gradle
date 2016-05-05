@@ -27,11 +27,18 @@ apply plugin: 'com.neenbedankt.android-apt'
 apply plugin: 'me.tatarka.retrolambda'
 apply plugin: 'de.mobilej.unmock'
 apply plugin: 'com.ofg.uptodate'
+apply plugin: 'net.ltgt.errorprone'
+apply plugin: 'com.squareup.sqldelight'
 apply from: '../AndroidCodeQualityConfig/quality.gradle'
 
 android {
     compileSdkVersion rootProject.ext.androidCompileSdkVersion
     buildToolsVersion rootProject.ext.androidBuildToolsVersion
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
 
     defaultConfig {
         minSdkVersion rootProject.ext.androidMinSdkVersion
@@ -72,6 +79,7 @@ unMock {
             '.3_r2-robolectric-0/android-all-4.3_r2-robolectric-0.jar'
 
     keep "android.os.Looper"
+    keep "android.content.ContentValues"
     keepStartingWith "android.util."
 }
 
@@ -119,10 +127,10 @@ dependencies {
     compile(baseDependencies.retrofitRxJavaAdapter) {
         exclude module: 'rxjava'
     }
-    compile(baseDependencies.storIOSQLite) {
+    compile(baseDependencies.sqlBrite) {
         exclude module: 'support-annotations'
+        exclude module: 'rxjava'
     }
-    compile baseDependencies.storIOSQLiteAnnotation
 
     compile baseDependencies.autoGsonAnnotation
 
@@ -131,6 +139,9 @@ dependencies {
 
     compile baseDependencies.timber
     compile baseDependencies.okHttpLogging
+    compile(baseDependencies.ok2Curl) {
+        exclude module: 'okhttp'
+    }
     compile(baseDependencies.stethoOkhttp) {
         exclude module: 'okhttp'
     }
@@ -138,7 +149,6 @@ dependencies {
     provided aptDependencies.autoValue  // used for AndroidStudio sync
     apt aptDependencies.daggerApt
     apt aptDependencies.autoParcelApt
-    apt aptDependencies.storIOSQLiteApt
     retrolambdaConfig aptDependencies.retrolambda
 
     testCompile project(':testbase')

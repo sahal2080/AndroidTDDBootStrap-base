@@ -26,12 +26,15 @@ package com.github.piasy.base.model.jsr310;
 
 import android.app.Application;
 import com.jakewharton.threetenabp.AndroidThreeTen;
+import javax.inject.Inject;
+import javax.inject.Singleton;
 
 /**
  * Created by Piasy{github.com/Piasy} on 15/8/16.
  *
  * Implementation of {@link ThreeTenABPDelegate}.
  */
+@Singleton
 public class ThreeTenABPDelegateImpl implements ThreeTenABPDelegate {
     private final Application mApplication;
 
@@ -42,7 +45,8 @@ public class ThreeTenABPDelegateImpl implements ThreeTenABPDelegate {
      * @param application the given {@link Application} object. Used to initialize the ThreeTenABP
      * library.
      */
-    public ThreeTenABPDelegateImpl(final Application application) {
+    @Inject
+    ThreeTenABPDelegateImpl(final Application application) {
         this.mApplication = application;
     }
 

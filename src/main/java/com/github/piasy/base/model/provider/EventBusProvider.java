@@ -24,7 +24,6 @@
 
 package com.github.piasy.base.model.provider;
 
-import android.support.annotation.NonNull;
 import com.google.auto.value.AutoValue;
 import org.greenrobot.eventbus.EventBus;
 
@@ -65,7 +64,6 @@ public final class EventBusProvider {
 
     @AutoValue
     public abstract static class Config {
-        @NonNull
         public static Builder builder() {
             return new AutoValue_EventBusProvider_Config.Builder();
         }

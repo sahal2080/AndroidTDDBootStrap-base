@@ -27,61 +27,49 @@ package com.github.piasy.base.model.provider;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.support.annotation.NonNull;
 import com.google.auto.value.AutoValue;
-import com.pushtorefresh.storio.sqlite.SQLiteTypeMapping;
-import com.pushtorefresh.storio.sqlite.StorIOSQLite;
-import com.pushtorefresh.storio.sqlite.impl.DefaultStorIOSQLite;
-import java.util.Map;
+import com.squareup.sqlbrite.BriteDatabase;
+import com.squareup.sqlbrite.SqlBrite;
+import rx.schedulers.Schedulers;
 
 /**
  * Created by Piasy{github.com/Piasy} on 15/7/24.
- *
- * A singleton provider providing {@link StorIOSQLite}.
  */
 @SuppressWarnings(value = { "PMD.NonThreadSafeSingleton", "PMD.DataflowAnomalyAnalysis" })
-public final class StorIOSQLiteProvider {
+public final class BriteDbProvider {
 
-    private static volatile StorIOSQLite sStorIOSQLite;
+    private static volatile BriteDatabase sBriteDb;
 
-    private StorIOSQLiteProvider() {
+    private BriteDbProvider() {
         // singleton
     }
 
-    /**
-     * Provide the {@link StorIOSQLite} singleton instance.
-     *
-     * @return the singleton {@link StorIOSQLite}.
-     */
-    static StorIOSQLite provideStorIOSQLite(final Config config) {
-        if (sStorIOSQLite == null) {
-            synchronized (StorIOSQLiteProvider.class) {
-                if (sStorIOSQLite == null) {
-                    final DefaultStorIOSQLite.CompleteBuilder builder =
-                            DefaultStorIOSQLite.builder()
-                                    .sqliteOpenHelper(config.sqliteOpenHelper());
-                    for (final Class clazz : config.typesMapping().keySet()) {
-                        builder.addTypeMapping(clazz, config.typesMapping().get(clazz));
-                    }
-                    sStorIOSQLite = builder.build();
+    static BriteDatabase provideBriteDb(final Config config) {
+        if (sBriteDb == null) {
+            synchronized (BriteDbProvider.class) {
+                if (sBriteDb == null) {
+                    sBriteDb = SqlBrite.create()
+                            .wrapDatabaseHelper(config.sqliteOpenHelper(), Schedulers.io());
+                    sBriteDb.setLoggingEnabled(config.enableLogging());
                 }
             }
         }
-        return sStorIOSQLite;
+        return sBriteDb;
     }
 
     @AutoValue
     public abstract static class Config {
         @NonNull
         public static Builder builder() {
-            return new AutoValue_StorIOSQLiteProvider_Config.Builder();
+            return new AutoValue_BriteDbProvider_Config.Builder();
         }
 
-        public abstract Map<Class, SQLiteTypeMapping> typesMapping();
+        public abstract boolean enableLogging();
 
         public abstract SQLiteOpenHelper sqliteOpenHelper();
 
         @AutoValue.Builder
         public abstract static class Builder {
-            public abstract Builder typesMapping(final Map<Class, SQLiteTypeMapping> typesMapping);
+            public abstract Builder enableLogging(final boolean enableLogging);
 
             public abstract Builder sqliteOpenHelper(final SQLiteOpenHelper sqliteOpenHelper);
 

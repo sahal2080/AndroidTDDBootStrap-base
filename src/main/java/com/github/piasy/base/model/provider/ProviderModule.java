@@ -25,7 +25,7 @@
 package com.github.piasy.base.model.provider;
 
 import com.google.gson.Gson;
-import com.pushtorefresh.storio.sqlite.StorIOSQLite;
+import com.squareup.sqlbrite.BriteDatabase;
 import dagger.Module;
 import dagger.Provides;
 import javax.inject.Singleton;
@@ -73,7 +73,7 @@ public class ProviderModule {
 
     @Singleton
     @Provides
-    StorIOSQLite provideStorIOSQLite(final StorIOSQLiteProvider.Config config) {
-        return StorIOSQLiteProvider.provideStorIOSQLite(config);
+    BriteDatabase provideBriteDb(final BriteDbProvider.Config config) {
+        return BriteDbProvider.provideBriteDb(config);
     }
 }

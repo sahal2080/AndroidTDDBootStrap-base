@@ -24,9 +24,10 @@
 
 package com.github.piasy.base.model.provider;
 
-import android.support.annotation.NonNull;
 import com.facebook.stetho.okhttp3.StethoInterceptor;
 import com.google.auto.value.AutoValue;
+import com.moczul.ok2curl.CurlInterceptor;
+import com.moczul.ok2curl.logger.Loggable;
 import okhttp3.OkHttpClient;
 import okhttp3.logging.HttpLoggingInterceptor;
 import timber.log.Timber;
@@ -58,15 +59,20 @@ public final class HttpClientProvider {
                 if (sOkHttpClient == null) {
                     final OkHttpClient.Builder builder = new OkHttpClient.Builder();
                     if (config.enableLog()) {
-                        final HttpLoggingInterceptor httpLoggingInterceptor =
-                                new HttpLoggingInterceptor(new HttpLoggingInterceptor.Logger() {
-                                    @Override
-                                    public void log(final String message) {
-                                        Timber.tag("OkHttp").d(message);
-                                    }
-                                }).setLevel(HttpLoggingInterceptor.Level.BODY);
                         builder.addNetworkInterceptor(new StethoInterceptor())
-                                .addInterceptor(httpLoggingInterceptor);
+                                .addInterceptor(new HttpLoggingInterceptor(
+                                        new HttpLoggingInterceptor.Logger() {
+                                            @Override
+                                            public void log(final String message) {
+                                                Timber.tag("OkHttp").d(message);
+                                            }
+                                        }).setLevel(HttpLoggingInterceptor.Level.BODY))
+                                .addInterceptor(new CurlInterceptor(new Loggable() {
+                                    @Override
+                                    public void log(String message) {
+                                        Timber.tag("Ok2Curl").d(message);
+                                    }
+                                }));
                     }
                     sOkHttpClient = builder.build();
                 }
@@ -77,7 +83,6 @@ public final class HttpClientProvider {
 
     @AutoValue
     public abstract static class Config {
-        @NonNull
         public static Builder builder() {
             return new AutoValue_HttpClientProvider_Config.Builder();
         }
