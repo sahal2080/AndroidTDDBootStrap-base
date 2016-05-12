@@ -73,10 +73,7 @@ android {
 }
 
 unMock {
-    // URI to download the android-all.jar from. e.g. https://oss.sonatype
-    // .org/content/groups/public/org/robolectric/android-all/
-    downloadFrom 'https://oss.sonatype.org/content/groups/public/org/robolectric/android-all/4' +
-            '.3_r2-robolectric-0/android-all-4.3_r2-robolectric-0.jar'
+    downloadFrom 'https://oss.sonatype.org/content/groups/public/org/robolectric/android-all/6.0.0_r1-robolectric-0/android-all-6.0.0_r1-robolectric-0.jar'
 
     keep "android.os.Looper"
     keep "android.content.ContentValues"
@@ -103,14 +100,24 @@ dependencies {
     compile(baseDependencies.rxAndroid) {
         exclude module: 'rxjava'
     }
-    compile(baseDependencies.rxBindingAppCompatV7) {
-        exclude module: 'support-annotations'
-        exclude module: 'appcompat-v7'
+    compile(baseDependencies.rxBinding) {
         exclude module: 'rxjava'
+        exclude module: 'rxandroid'
+        exclude module: 'support-annotations'
+    }
+    compile(baseDependencies.rxBindingAppCompatV7) {
+        exclude module: 'appcompat-v7'
+        exclude module: 'rxbinding'
+    }
+    compile(baseDependencies.rxLifeCycle) {
+        exclude module: 'rxjava'
+        exclude module: 'rxbinding'
+        exclude module: 'support-annotations'
     }
     compile(baseDependencies.rxLifeCycleComponent) {
-        exclude module: 'appcompat-v7'
         exclude module: 'rxjava'
+        exclude module: 'rxlifecycle'
+        exclude module: 'appcompat-v7'
     }
     compile baseDependencies.eventBus
     compile baseDependencies.dagger
@@ -150,6 +157,7 @@ dependencies {
     apt aptDependencies.daggerApt
     apt aptDependencies.autoParcelApt
     retrolambdaConfig aptDependencies.retrolambda
+    errorprone aptDependencies.errorprone
 
     testCompile project(':testbase')
     testCompile(testDependencies.junit) {
