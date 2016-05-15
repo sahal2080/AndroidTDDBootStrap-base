@@ -34,6 +34,7 @@ import com.github.piasy.safelyandroid.fragment.SupportFragmentTransactionDelegat
 import com.github.piasy.safelyandroid.fragment.TransactionCommitter;
 import com.trello.rxlifecycle.components.support.RxAppCompatActivity;
 import com.yatatsu.autobundle.AutoBundle;
+import onactivityresult.ActivityResult;
 
 /**
  * Created by Piasy{github.com/Piasy} on 15/7/23.
@@ -84,6 +85,19 @@ public abstract class BaseActivity extends RxAppCompatActivity implements Transa
 
     protected final boolean startActivitySafely(final Intent intent) {
         return StartActivityDelegate.startActivitySafely(this, intent);
+    }
+
+    @Override
+    protected void onActivityResult(final int requestCode, final int resultCode,
+            final Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (handleActivityResult()) {
+            ActivityResult.onResult(requestCode, resultCode, data).into(this);
+        }
+    }
+
+    protected boolean handleActivityResult() {
+        return false;
     }
 
     /**

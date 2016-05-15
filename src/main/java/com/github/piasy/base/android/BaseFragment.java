@@ -42,6 +42,7 @@ import com.jakewharton.rxbinding.view.RxView;
 import com.trello.rxlifecycle.components.support.RxFragment;
 import com.yatatsu.autobundle.AutoBundle;
 import java.util.concurrent.TimeUnit;
+import onactivityresult.ActivityResult;
 import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Action1;
@@ -109,6 +110,16 @@ public abstract class BaseFragment extends RxFragment implements TransactionComm
 
     protected final boolean startActivitySafely(final Intent intent) {
         return StartActivityDelegate.startActivitySafely(this, intent);
+    }
+
+    protected final boolean startActivityForResultSafely(final Intent intent, final int code) {
+        return StartActivityDelegate.startActivityForResultSafely(this, intent, code);
+    }
+
+    @Override
+    public void onActivityResult(final int requestCode, final int resultCode, final Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        ActivityResult.onResult(requestCode, resultCode, data).into(this);
     }
 
     protected boolean safeCommit(@NonNull final FragmentTransaction transaction) {

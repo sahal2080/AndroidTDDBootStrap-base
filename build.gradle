@@ -143,6 +143,9 @@ dependencies {
 
     compile baseDependencies.threetenabp
     compile baseDependencies.autoBundle
+    compile(baseDependencies.onActivityResult) {
+        exclude module: 'support-annotations'
+    }
 
     compile baseDependencies.timber
     compile baseDependencies.okHttpLogging
