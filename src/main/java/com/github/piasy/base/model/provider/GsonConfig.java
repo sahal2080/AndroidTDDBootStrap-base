@@ -25,7 +25,8 @@ public abstract class GsonConfig {
 
         public abstract Builder dateFormatString(final String dateFormatString);
 
-        public abstract Builder autoGsonTypeAdapterFactory(TypeAdapterFactory typeAdapterFactory);
+        public abstract Builder autoGsonTypeAdapterFactory(
+                final TypeAdapterFactory typeAdapterFactory);
 
         public abstract GsonConfig build();
     }
