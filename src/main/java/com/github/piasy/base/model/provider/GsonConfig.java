@@ -1,6 +1,7 @@
 package com.github.piasy.base.model.provider;
 
 import com.google.auto.value.AutoValue;
+import com.google.gson.TypeAdapterFactory;
 import org.threeten.bp.format.DateTimeFormatter;
 
 /**
@@ -16,11 +17,15 @@ public abstract class GsonConfig {
 
     public abstract String dateFormatString();
 
+    public abstract TypeAdapterFactory autoGsonTypeAdapterFactory();
+
     @AutoValue.Builder
     public abstract static class Builder {
         public abstract Builder dateTimeFormatter(final DateTimeFormatter dateTimeFormatter);
 
         public abstract Builder dateFormatString(final String dateFormatString);
+
+        public abstract Builder autoGsonTypeAdapterFactory(TypeAdapterFactory typeAdapterFactory);
 
         public abstract GsonConfig build();
     }

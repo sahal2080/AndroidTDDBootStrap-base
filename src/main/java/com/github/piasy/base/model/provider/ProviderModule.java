@@ -30,7 +30,6 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.moczul.ok2curl.CurlInterceptor;
 import com.moczul.ok2curl.logger.Loggable;
-import com.ryanharter.auto.value.gson.annotations.AutoTypeAdapterFactory;
 import com.squareup.sqlbrite.BriteDatabase;
 import com.squareup.sqlbrite.SqlBrite;
 import dagger.Module;
@@ -66,7 +65,7 @@ public class ProviderModule {
     @Singleton
     @Provides
     Gson provideGson(final GsonConfig config) {
-        return new GsonBuilder().registerTypeAdapterFactory(new AutoTypeAdapterFactory())
+        return new GsonBuilder().registerTypeAdapterFactory(config.autoGsonTypeAdapterFactory())
                 .registerTypeAdapter(ZonedDateTime.class,
                         new ZonedDateTimeJsonConverter(config.dateTimeFormatter()))
                 .setDateFormat(config.dateFormatString())

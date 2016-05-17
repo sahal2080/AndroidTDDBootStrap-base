@@ -139,8 +139,6 @@ dependencies {
         exclude module: 'rxjava'
     }
 
-    compile baseDependencies.autoGsonAnnotation
-
     compile baseDependencies.threetenabp
     compile baseDependencies.autoBundle
     compile(baseDependencies.onActivityResult) {
