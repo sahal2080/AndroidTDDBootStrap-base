@@ -25,12 +25,14 @@
 package com.github.piasy.base.android;
 
 import android.app.Dialog;
+import android.content.Intent;
 import android.content.res.Resources;
 import android.os.Bundle;
 import android.support.annotation.LayoutRes;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.DialogFragment;
+import android.support.v4.app.FragmentTransaction;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -38,9 +40,14 @@ import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
 import butterknife.ButterKnife;
+import butterknife.Unbinder;
 import com.github.piasy.base.utils.RxUtil;
-import com.hannesdorfmann.fragmentargs.FragmentArgs;
+import com.github.piasy.safelyandroid.activity.StartActivityDelegate;
+import com.github.piasy.safelyandroid.dialogfragment.SupportDialogFragmentDismissDelegate;
+import com.github.piasy.safelyandroid.fragment.SupportFragmentTransactionDelegate;
+import com.github.piasy.safelyandroid.fragment.TransactionCommitter;
 import com.jakewharton.rxbinding.view.RxView;
+import com.yatatsu.autobundle.AutoBundle;
 import java.util.concurrent.TimeUnit;
 import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
@@ -50,20 +57,25 @@ import rx.subscriptions.CompositeSubscription;
 /**
  * Created by piasy on 15/5/4.
  */
-public abstract class BaseDialogFragment extends DialogFragment {
+@SuppressWarnings("PMD.TooManyMethods")
+public abstract class BaseDialogFragment extends DialogFragment implements TransactionCommitter {
 
     private static final float DEFAULT_DIM_AMOUNT = 0.2F;
 
     private static final int WINDOW_DURATION = 1;
-
+    private final SupportDialogFragmentDismissDelegate mSupportDialogFragmentDismissDelegate =
+            new SupportDialogFragmentDismissDelegate();
+    private final SupportFragmentTransactionDelegate mSupportFragmentTransactionDelegate =
+            new SupportFragmentTransactionDelegate();
     private CompositeSubscription mCompositeSubscription;
+    private Unbinder mUnBinder;
 
     @Override
     public void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setRetainInstance(true);
         if (hasArgs()) {
-            FragmentArgs.inject(this);
+            AutoBundle.bind(this);
         }
     }
 
@@ -121,10 +133,42 @@ public abstract class BaseDialogFragment extends DialogFragment {
         return inflater.inflate(getLayoutRes(), container, false);
     }
 
+    /**
+     * CONTRACT: the new life cycle method {@link #initFields()}, {@link #bindView(View)}
+     * and {@link #startBusiness()} might use other infrastructure initialised in subclass's
+     * onViewCreated, e.g. DI, MVP, so those subclass should do those
+     * infrastructure init job before this method is invoked.
+     */
     @Override
     public void onViewCreated(final View view, final Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        initFields();
         bindView(view);
+        startBusiness();
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        mSupportDialogFragmentDismissDelegate.onResumed(this);
+        mSupportFragmentTransactionDelegate.onResumed();
+    }
+
+    protected final boolean startActivitySafely(final Intent intent) {
+        return StartActivityDelegate.startActivitySafely(this, intent);
+    }
+
+    protected boolean safeCommit(@NonNull final FragmentTransaction transaction) {
+        return mSupportFragmentTransactionDelegate.safeCommit(this, transaction);
+    }
+
+    public boolean safeDismiss() {
+        return mSupportDialogFragmentDismissDelegate.safeDismiss(this);
+    }
+
+    @Override
+    public boolean isCommitterResumed() {
+        return isResumed();
     }
 
     protected void addSubscribe(final Subscription subscription) {
@@ -136,8 +180,13 @@ public abstract class BaseDialogFragment extends DialogFragment {
     }
 
     protected void listenOnClickRxy(final View view, final Action1<Void> action) {
+        listenOnClickRxy(view, WINDOW_DURATION, action);
+    }
+
+    protected void listenOnClickRxy(final View view, final int seconds,
+            final Action1<Void> action) {
         addSubscribe(RxView.clicks(view)
-                .throttleFirst(WINDOW_DURATION, TimeUnit.SECONDS)
+                .throttleFirst(seconds, TimeUnit.SECONDS)
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(action, RxUtil.OnErrorLogger));
     }
@@ -172,7 +221,7 @@ public abstract class BaseDialogFragment extends DialogFragment {
     }
 
     /**
-     * When use FragmentArgs to inject arguments, should override this and return {@code true}.
+     * When use AutoBundle to inject arguments, should override this and return {@code true}.
      */
     protected boolean hasArgs() {
         return false;
@@ -187,20 +236,36 @@ public abstract class BaseDialogFragment extends DialogFragment {
     }
 
     /**
+     * init necessary fields.
+     */
+    @SuppressWarnings("PMD.EmptyMethodInAbstractClassShouldBeAbstract")
+    protected void initFields() {
+
+    }
+
+    /**
      * bind views, should override this method when bind view manually.
      */
     protected void bindView(final View rootView) {
         if (autoBindViews()) {
-            ButterKnife.bind(this, rootView);
+            mUnBinder = ButterKnife.bind(this, rootView);
         }
+    }
+
+    /**
+     * start specific business logic.
+     */
+    @SuppressWarnings("PMD.EmptyMethodInAbstractClassShouldBeAbstract")
+    protected void startBusiness() {
+
     }
 
     /**
      * unbind views, should override this method when unbind view manually.
      */
     protected void unbindView() {
-        if (autoBindViews()) {
-            ButterKnife.unbind(this);
+        if (autoBindViews() && mUnBinder != null) {
+            mUnBinder.unbind();
         }
     }
 }

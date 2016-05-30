@@ -24,7 +24,6 @@
 
 package com.github.piasy.base.model.jsr310;
 
-import android.app.Application;
 import android.support.annotation.NonNull;
 import dagger.Module;
 import dagger.Provides;
@@ -32,21 +31,14 @@ import javax.inject.Singleton;
 
 /**
  * Created by Piasy{github.com/Piasy} on 15/8/9.
- *
- * Dagger2 {@link Module} for JSR-310.
  */
 @Module
 public class JSR310Module {
 
-    /**
-     * Provide {@link ThreeTenABPDelegate} with the given context.
-     *
-     * @param application the {@link Application} object.
-     * @return the provided {@link ThreeTenABPDelegate}
-     */
     @Singleton
     @Provides
-    ThreeTenABPDelegate provideThreeTenABPDelegate(@NonNull final Application application) {
-        return new ThreeTenABPDelegateImpl(application);
+    ThreeTenABPDelegate provideThreeTenABPDelegate(
+            @NonNull final ThreeTenABPDelegateImpl delegate) {
+        return delegate;
     }
 }

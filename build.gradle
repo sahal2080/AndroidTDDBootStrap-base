@@ -27,11 +27,18 @@ apply plugin: 'com.neenbedankt.android-apt'
 apply plugin: 'me.tatarka.retrolambda'
 apply plugin: 'de.mobilej.unmock'
 apply plugin: 'com.ofg.uptodate'
+apply plugin: 'net.ltgt.errorprone'
+apply plugin: 'com.squareup.sqldelight'
 apply from: '../AndroidCodeQualityConfig/quality.gradle'
 
 android {
     compileSdkVersion rootProject.ext.androidCompileSdkVersion
     buildToolsVersion rootProject.ext.androidBuildToolsVersion
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
 
     defaultConfig {
         minSdkVersion rootProject.ext.androidMinSdkVersion
@@ -66,81 +73,96 @@ android {
 }
 
 unMock {
-    // URI to download the android-all.jar from. e.g. https://oss.sonatype
-    // .org/content/groups/public/org/robolectric/android-all/
-    downloadFrom 'https://oss.sonatype.org/content/groups/public/org/robolectric/android-all/4' +
-            '.3_r2-robolectric-0/android-all-4.3_r2-robolectric-0.jar'
+    downloadFrom 'https://oss.sonatype.org/content/groups/public/org/robolectric/android-all/6.0.0_r1-robolectric-0/android-all-6.0.0_r1-robolectric-0.jar'
 
     keep "android.os.Looper"
+    keep "android.content.ContentValues"
     keepStartingWith "android.util."
 }
 
 dependencies {
     def baseDependencies = rootProject.ext.baseDependencies
-    def baseTestDependencies = rootProject.ext.baseTestDependencies
+    def aptDependencies = rootProject.ext.aptDependencies
+    def testDependencies = rootProject.ext.testDependencies
 
-    compile baseDependencies.supportAnnotation
+    compile baseDependencies.androidSupportAppCompatV7
+    compile(baseDependencies.safelyAndroid) {
+        exclude module: 'appcompat-v7'
+    }
+
+    compile baseDependencies.javaxAnnotation
 
     compile(baseDependencies.mvp) {
         exclude module: 'appcompat-v7'
         exclude module: 'support-annotations'
     }
-    compile baseDependencies.fragmentargs
-    apt baseDependencies.fragmentargsApt
-
-    compile (baseDependencies.storIOSQLite) {
-        exclude module: 'support-annotations'
-    }
-    compile baseDependencies.storIOSQLiteAnnotation
-    apt baseDependencies.storIOSQLiteAnnotationProcessor
-    compile baseDependencies.threetenabp
-    compile baseDependencies.gson
     compile baseDependencies.rxJava
-    compile (baseDependencies.rxAndroid) {
+    compile(baseDependencies.rxAndroid) {
         exclude module: 'rxjava'
     }
-    compile baseDependencies.eventBus
-    compile baseDependencies.okHttp
-    compile (baseDependencies.retrofit) {
-        exclude module: 'okhttp'
-    }
-    compile (baseDependencies.retrofitGsonConverter) {
-        exclude module: 'gson'
-    }
-    compile (baseDependencies.retrofitRxJavaAdapter) {
+    compile(baseDependencies.rxBinding) {
         exclude module: 'rxjava'
-    }
-
-    compile baseDependencies.autoParcel
-    apt baseDependencies.autoParcelProcessor
-
-    compile baseDependencies.dagger
-    apt baseDependencies.daggerCompiler
-    compile baseDependencies.javaxAnnotation
-    compile baseDependencies.butterKnife
-
-    compile baseDependencies.androidSupportAppCompatV7
-    compile (baseDependencies.rxBindingAppCompatV7) {
+        exclude module: 'rxandroid'
         exclude module: 'support-annotations'
+    }
+    compile(baseDependencies.rxBindingAppCompatV7) {
         exclude module: 'appcompat-v7'
-        exclude module: 'rxjava'
+        exclude module: 'rxbinding'
     }
     compile(baseDependencies.rxLifeCycle) {
-        exclude module: 'rxbinding'
         exclude module: 'rxjava'
+        exclude module: 'rxbinding'
+        exclude module: 'support-annotations'
     }
     compile(baseDependencies.rxLifeCycleComponent) {
+        exclude module: 'rxjava'
         exclude module: 'rxlifecycle'
         exclude module: 'appcompat-v7'
+    }
+    compile baseDependencies.eventBus
+    compile baseDependencies.dagger
+    compile baseDependencies.butterKnife
+
+    compile baseDependencies.gson
+    compile baseDependencies.okHttp
+    compile(baseDependencies.retrofit) {
+        exclude module: 'okhttp'
+    }
+    compile(baseDependencies.retrofitGsonConverter) {
+        exclude module: 'gson'
+    }
+    compile(baseDependencies.retrofitRxJavaAdapter) {
+        exclude module: 'rxjava'
+    }
+    compile(baseDependencies.sqlBrite) {
+        exclude module: 'support-annotations'
         exclude module: 'rxjava'
     }
 
-    compile baseDependencies.xLogCompiler
+    compile baseDependencies.threetenabp
+    compile baseDependencies.autoBundle
+    compile(baseDependencies.onActivityResult) {
+        exclude module: 'support-annotations'
+    }
+
     compile baseDependencies.timber
+    compile baseDependencies.okHttpLogging
+    compile(baseDependencies.ok2Curl) {
+        exclude module: 'okhttp'
+    }
+    compile(baseDependencies.stethoOkhttp) {
+        exclude module: 'okhttp'
+    }
+
+    provided aptDependencies.autoValue  // used for AndroidStudio sync
+    apt aptDependencies.daggerApt
+    apt aptDependencies.autoParcelApt
+    retrolambdaConfig aptDependencies.retrolambda
+    errorprone aptDependencies.errorprone
 
     testCompile project(':testbase')
-    testCompile (baseTestDependencies.junit) {
+    testCompile(testDependencies.junit) {
         exclude module: 'hamcrest-core'
     }
-    testCompile baseTestDependencies.mockito
+    testCompile testDependencies.mockito
 }

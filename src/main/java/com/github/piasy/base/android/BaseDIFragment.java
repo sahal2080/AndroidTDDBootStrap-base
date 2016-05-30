@@ -25,7 +25,6 @@
 package com.github.piasy.base.android;
 
 import android.os.Bundle;
-import android.view.View;
 import com.github.piasy.base.di.BaseComponent;
 import com.github.piasy.base.di.HasComponent;
 
@@ -40,10 +39,17 @@ public abstract class BaseDIFragment<C extends BaseComponent> extends BaseFragme
 
     private C mComponent;
 
+    /**
+     * according to {@link super#onViewCreated(android.view.View, Bundle)}'s contract, we should
+     * init DI infrastructure before {@link super#onViewCreated(android.view.View, Bundle)} is
+     * invoked.
+     *
+     * So we init DI here.
+     */
     @Override
-    public void onViewCreated(final View view, final Bundle savedInstanceState) {
+    public void onCreate(final Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
         injectDependencies();
-        super.onViewCreated(view, savedInstanceState);
     }
 
     @SuppressWarnings("unchecked")

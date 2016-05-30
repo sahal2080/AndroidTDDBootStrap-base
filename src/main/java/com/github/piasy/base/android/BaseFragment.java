@@ -24,17 +24,25 @@
 
 package com.github.piasy.base.android;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.LayoutRes;
+import android.support.annotation.NonNull;
+import android.support.v4.app.FragmentTransaction;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import butterknife.ButterKnife;
+import butterknife.Unbinder;
 import com.github.piasy.base.utils.RxUtil;
-import com.hannesdorfmann.fragmentargs.FragmentArgs;
+import com.github.piasy.safelyandroid.activity.StartActivityDelegate;
+import com.github.piasy.safelyandroid.fragment.SupportFragmentTransactionDelegate;
+import com.github.piasy.safelyandroid.fragment.TransactionCommitter;
 import com.jakewharton.rxbinding.view.RxView;
 import com.trello.rxlifecycle.components.support.RxFragment;
+import com.yatatsu.autobundle.AutoBundle;
 import java.util.concurrent.TimeUnit;
+import onactivityresult.ActivityResult;
 import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Action1;
@@ -45,24 +53,40 @@ import rx.subscriptions.CompositeSubscription;
  *
  * Base fragment class.
  */
-public abstract class BaseFragment extends RxFragment {
+public abstract class BaseFragment extends RxFragment implements TransactionCommitter {
 
     private static final int WINDOW_DURATION = 1;
-
+    private final SupportFragmentTransactionDelegate mSupportFragmentTransactionDelegate =
+            new SupportFragmentTransactionDelegate();
     private CompositeSubscription mCompositeSubscription;
+    private Unbinder mUnBinder;
 
     @Override
     public void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (hasArgs()) {
-            FragmentArgs.inject(this);
+            AutoBundle.bind(this);
         }
     }
 
+    /**
+     * CONTRACT: the new life cycle method {@link #initFields()}, {@link #bindView(View)}
+     * and {@link #startBusiness()} might use other infrastructure initialised in subclass's
+     * onViewCreated, e.g. DI, MVP, so those subclass should do those
+     * infrastructure init job before this method is invoked.
+     */
     @Override
     public void onViewCreated(final View view, final Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        initFields();
         bindView(view);
+        startBusiness();
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        mSupportFragmentTransactionDelegate.onResumed();
     }
 
     @Override
@@ -79,6 +103,29 @@ public abstract class BaseFragment extends RxFragment {
         return inflater.inflate(getLayoutRes(), container, false);
     }
 
+    @Override
+    public boolean isCommitterResumed() {
+        return isResumed();
+    }
+
+    protected final boolean startActivitySafely(final Intent intent) {
+        return StartActivityDelegate.startActivitySafely(this, intent);
+    }
+
+    protected final boolean startActivityForResultSafely(final Intent intent, final int code) {
+        return StartActivityDelegate.startActivityForResultSafely(this, intent, code);
+    }
+
+    @Override
+    public void onActivityResult(final int requestCode, final int resultCode, final Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        ActivityResult.onResult(requestCode, resultCode, data).into(this);
+    }
+
+    protected boolean safeCommit(@NonNull final FragmentTransaction transaction) {
+        return mSupportFragmentTransactionDelegate.safeCommit(this, transaction);
+    }
+
     protected void addSubscribe(final Subscription subscription) {
         if (mCompositeSubscription == null || mCompositeSubscription.isUnsubscribed()) {
             // recreate mCompositeSubscription
@@ -88,8 +135,13 @@ public abstract class BaseFragment extends RxFragment {
     }
 
     protected void listenOnClickRxy(final View view, final Action1<Void> action) {
+        listenOnClickRxy(view, WINDOW_DURATION, action);
+    }
+
+    protected void listenOnClickRxy(final View view, final int seconds,
+            final Action1<Void> action) {
         addSubscribe(RxView.clicks(view)
-                .throttleFirst(WINDOW_DURATION, TimeUnit.SECONDS)
+                .throttleFirst(seconds, TimeUnit.SECONDS)
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(action, RxUtil.OnErrorLogger));
     }
@@ -116,7 +168,7 @@ public abstract class BaseFragment extends RxFragment {
     }
 
     /**
-     * When use FragmentArgs to inject arguments, should override this and return {@code true}.
+     * When use AutoBundle to inject arguments, should override this and return {@code true}.
      */
     protected boolean hasArgs() {
         return false;
@@ -131,20 +183,36 @@ public abstract class BaseFragment extends RxFragment {
     }
 
     /**
+     * init necessary fields.
+     */
+    @SuppressWarnings("PMD.EmptyMethodInAbstractClassShouldBeAbstract")
+    protected void initFields() {
+
+    }
+
+    /**
      * bind views, should override this method when bind view manually.
      */
     protected void bindView(final View rootView) {
         if (autoBindViews()) {
-            ButterKnife.bind(this, rootView);
+            mUnBinder = ButterKnife.bind(this, rootView);
         }
+    }
+
+    /**
+     * start specific business logic.
+     */
+    @SuppressWarnings("PMD.EmptyMethodInAbstractClassShouldBeAbstract")
+    protected void startBusiness() {
+
     }
 
     /**
      * unbind views, should override this method when unbind view manually.
      */
     protected void unbindView() {
-        if (autoBindViews()) {
-            ButterKnife.unbind(this);
+        if (autoBindViews() && mUnBinder != null) {
+            mUnBinder.unbind();
         }
     }
 }

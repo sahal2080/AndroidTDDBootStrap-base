@@ -78,7 +78,7 @@ public class MockitoTest {
     public void testArgCapList() {
         // given
         final TestInterface mock = mock(TestInterface.class);
-        final ArgumentCaptor<List<Integer>> captor = ArgumentCaptor.forClass(List.class);
+        final ArgumentCaptor<List> captor = ArgumentCaptor.forClass(List.class);
         final List<Integer> list1 = new ArrayList<>();
         list1.add(1);
         list1.add(2);

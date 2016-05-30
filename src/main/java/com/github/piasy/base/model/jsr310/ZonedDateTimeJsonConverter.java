@@ -38,7 +38,7 @@ import org.threeten.bp.format.DateTimeFormatter;
 /**
  * GSON serialiser/deserialiser for converting {@link ZonedDateTime} objects.
  */
-public class CustomZonedDateTimeConverter
+public class ZonedDateTimeJsonConverter
         implements JsonSerializer<ZonedDateTime>, JsonDeserializer<ZonedDateTime> {
     /** Formatter. */
     private final DateTimeFormatter mDateTimeFormatter;
@@ -48,7 +48,7 @@ public class CustomZonedDateTimeConverter
      *
      * @param formatter the given {@link DateTimeFormatter}.
      */
-    public CustomZonedDateTimeConverter(final DateTimeFormatter formatter) {
+    public ZonedDateTimeJsonConverter(final DateTimeFormatter formatter) {
         mDateTimeFormatter = formatter;
     }
 

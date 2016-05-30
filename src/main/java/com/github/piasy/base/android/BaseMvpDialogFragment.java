@@ -24,7 +24,11 @@
 
 package com.github.piasy.base.android;
 
+import android.app.Activity;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+import android.view.View;
 import com.github.piasy.base.di.BaseMvpComponent;
 import com.hannesdorfmann.mosby.mvp.MvpPresenter;
 import com.hannesdorfmann.mosby.mvp.MvpView;
@@ -43,10 +47,96 @@ public abstract class BaseMvpDialogFragment<V extends MvpView, P extends MvpPres
     protected P mPresenter;
 
     @Override
+    public void onAttach(final Activity activity) {
+        super.onAttach(activity);
+        getMvpDelegate().onAttach(activity);
+    }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        getMvpDelegate().onDetach();
+    }
+
+    @Override
+    public void onActivityCreated(@Nullable final Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+        getMvpDelegate().onActivityCreated(savedInstanceState);
+    }
+
+    @Override
+    public void onSaveInstanceState(final Bundle outState) {
+        super.onSaveInstanceState(outState);
+        getMvpDelegate().onSaveInstanceState(outState);
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        getMvpDelegate().onStop();
+    }
+
+    @Override
     public void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mMvpDelegate = new FragmentMvpDelegateImpl<>(this);
-        mPresenter = createPresenter();
+        getMvpDelegate().onCreate(savedInstanceState);
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        getMvpDelegate().onStart();
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        getMvpDelegate().onDestroyView();
+    }
+
+    /**
+     * according to {@link super#onViewCreated(View, Bundle)}'s contract, we should init MVP
+     * infrastructure before {@link super#onViewCreated(View, Bundle)} is invoked.
+     *
+     * So we init MVP here and before call super.
+     */
+    @Override
+    public void onViewCreated(final View view, final Bundle savedInstanceState) {
+        getMvpDelegate().onViewCreated(view, savedInstanceState);
+        super.onViewCreated(view, savedInstanceState);
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        getMvpDelegate().onResume();
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        getMvpDelegate().onPause();
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        getMvpDelegate().onDestroy();
+    }
+
+    private FragmentMvpDelegate<V, P> getMvpDelegate() {
+        if (mMvpDelegate == null) {
+            mMvpDelegate = new FragmentMvpDelegateImpl<>(this);
+        }
+
+        return mMvpDelegate;
+    }
+
+    @NonNull
+    @Override
+    public final P createPresenter() {
+        mPresenter = getComponent().presenter();
+        return mPresenter;
     }
 
     @Override
@@ -56,5 +146,21 @@ public abstract class BaseMvpDialogFragment<V extends MvpView, P extends MvpPres
 
     @Override
     public final void setPresenter(final P presenter) {
+    }
+
+    @SuppressWarnings("unchecked")
+    @Override
+    public final V getMvpView() {
+        return (V) this;
+    }
+
+    @Override
+    public boolean isRetainInstance() {
+        return true;
+    }
+
+    @Override
+    public boolean shouldInstanceBeRetained() {
+        return true;
     }
 }

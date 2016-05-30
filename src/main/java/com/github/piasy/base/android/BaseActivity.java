@@ -24,28 +24,87 @@
 
 package com.github.piasy.base.android;
 
-import android.os.Build;
+import android.content.Intent;
 import android.os.Bundle;
-import android.view.WindowManager;
+import android.support.annotation.NonNull;
+import android.support.v4.app.FragmentTransaction;
 import com.github.piasy.base.di.ActivityModule;
+import com.github.piasy.safelyandroid.activity.StartActivityDelegate;
+import com.github.piasy.safelyandroid.fragment.SupportFragmentTransactionDelegate;
+import com.github.piasy.safelyandroid.fragment.TransactionCommitter;
 import com.trello.rxlifecycle.components.support.RxAppCompatActivity;
+import com.yatatsu.autobundle.AutoBundle;
+import onactivityresult.ActivityResult;
 
 /**
  * Created by Piasy{github.com/Piasy} on 15/7/23.
  *
  * Base Activity class.
  */
-public abstract class BaseActivity extends RxAppCompatActivity {
+public abstract class BaseActivity extends RxAppCompatActivity implements TransactionCommitter {
+
+    private final SupportFragmentTransactionDelegate mSupportFragmentTransactionDelegate =
+            new SupportFragmentTransactionDelegate();
+    private volatile boolean mIsResumed;
 
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-            final WindowManager.LayoutParams localLayoutParams = getWindow().getAttributes();
-            localLayoutParams.flags =
-                    WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS | localLayoutParams.flags;
-        }
         initializeInjector();
         super.onCreate(savedInstanceState);
+        if (hasArgs()) {
+            if (savedInstanceState == null) {
+                AutoBundle.bind(this);
+            } else {
+                AutoBundle.bind(this, savedInstanceState);
+            }
+        }
+        mIsResumed = true;
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        mIsResumed = false;
+    }
+
+    protected boolean safeCommit(@NonNull final FragmentTransaction transaction) {
+        return mSupportFragmentTransactionDelegate.safeCommit(this, transaction);
+    }
+
+    @Override
+    protected void onResumeFragments() {
+        super.onResumeFragments();
+        mIsResumed = true;
+        mSupportFragmentTransactionDelegate.onResumed();
+    }
+
+    @Override
+    public boolean isCommitterResumed() {
+        return mIsResumed;
+    }
+
+    protected final boolean startActivitySafely(final Intent intent) {
+        return StartActivityDelegate.startActivitySafely(this, intent);
+    }
+
+    @Override
+    protected void onActivityResult(final int requestCode, final int resultCode,
+            final Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (handleActivityResult()) {
+            ActivityResult.onResult(requestCode, resultCode, data).into(this);
+        }
+    }
+
+    protected boolean handleActivityResult() {
+        return false;
+    }
+
+    /**
+     * When use AutoBundle to inject arguments, should override this and return {@code true}.
+     */
+    protected boolean hasArgs() {
+        return false;
     }
 
     /**
